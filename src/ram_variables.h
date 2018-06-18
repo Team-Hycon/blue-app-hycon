@@ -45,7 +45,6 @@ extern enum UI_STATE G_ui_state;
 
 // IO buffer to communicate with the outside world.
 extern unsigned char G_io_seproxyhal_spi_buffer[IO_SEPROXYHAL_BUFFER_SIZE_B];
-extern Tx G_tx_content;
 extern hycon_hash_t G_tx_hash;
 extern uint8_t G_bip32_path_length;
 extern uint32_t G_bip32_path[MAX_BIP32_PATH];

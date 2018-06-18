@@ -57,7 +57,6 @@ DEFINES += CUSTOM_IO_APDU_BUFFER_SIZE=\(255+5+64\)
 DEFINES += HAVE_USB_CLASS_CCID
 
 DEFINES += CX_COMLIANCE_141
-DEFINES += PB_BUFFER_ONLY
 
 ##############
 # Compiler #
@@ -92,7 +91,7 @@ LDLIBS += -lm -lgcc -lc
 include $(BOLOS_SDK)/Makefile.glyphs
 
 ### variables processed by the common makefile.rules of the SDK to grab source files and include dirs
-APP_SOURCE_PATH += src blake2b nanopb
+APP_SOURCE_PATH += src blake2b
 SDK_SOURCE_PATH += lib_stusb qrcode
 
 #use the SDK U2F+HIDGEN USB profile

@@ -20,36 +20,38 @@
 
 #include "ram_variables.h"
 
+uint64_t _decode_varint(uint8_t *buf, uint8_t *skip_bytes);
+
 void get_compressed_public_key_value(unsigned char *value, unsigned char *out) {
 	memcpy(out, value, 65);
 	out[0] = ((out[64] & 1) ? 0x03 : 0x02);
 }
 
-void get_address_string_from_key(const cx_ecfp_public_key_t publicKey,
+void get_address_string_from_key(const cx_ecfp_public_key_t public_key,
                                  uint8_t *out) {
-	hycon_hash_t hashAddress;
+	hycon_hash_t hash_address;
 
 	// Compressed public key
-	unsigned char tmpPubKey[65];
-	get_compressed_public_key_value(publicKey.W, tmpPubKey);
+	unsigned char tmp_pub_key[65];
+	get_compressed_public_key_value(public_key.W, tmp_pub_key);
 
-	blake2b(hashAddress, sizeof(hycon_hash_t), tmpPubKey, 32, &G_blake2b_state, 0);
+	blake2b(hash_address, sizeof(hycon_hash_t), tmp_pub_key, 32, &G_blake2b_state, 0);
 
-	os_memmove(out, hashAddress + 12, 20);
+	os_memmove(out, hash_address + 12, 20);
 }
 
-uint32_t set_result_publicKey(cx_ecfp_public_key_t publicKey) {
+uint32_t set_result_publicKey(cx_ecfp_public_key_t public_key) {
 	uint32_t tx = 0;
 	G_io_apdu_buffer[tx++] = 32;
 
 	// Compressed public key
-	unsigned char tmpPubKey[65];
-	get_compressed_public_key_value(publicKey.W, tmpPubKey);
-	os_memmove(G_io_apdu_buffer + tx, tmpPubKey, 32);
+	unsigned char tmp_pub_key[65];
+	get_compressed_public_key_value(public_key.W, tmp_pub_key);
+	os_memmove(G_io_apdu_buffer + tx, tmp_pub_key, 32);
 	tx += 32;
 
 	uint8_t address[21];
-	get_address_string_from_key(publicKey, address);
+	get_address_string_from_key(public_key, address);
 	G_io_apdu_buffer[tx++] = 20;
 	os_memmove(G_io_apdu_buffer + tx, address, 20);
 	tx += 20;
@@ -74,4 +76,52 @@ void int_to_displayable_chars(uint64_t number, char *out) {
 	}
 
 	out[j] = '\0';
+}
+
+// TODO: verify field number and type
+bool decode_tx(uint8_t *buf, hycon_tx *tx_content) {
+	size_t i;
+	size_t len;
+
+	// TO
+	buf++;	// intentional skip
+	len = *(buf++);
+	for (i = 0; i < len; i++) {
+		tx_content->to[i] = *(buf++);
+	}
+	tx_content->to[i] = '\0';
+
+	// AMOUNT
+	uint8_t skip_bytes;
+	tx_content->amount = _decode_varint(buf, &skip_bytes);
+
+	// FEE
+	buf+=skip_bytes;
+	tx_content->fee = _decode_varint(buf, &skip_bytes);
+
+	return true;
+}
+
+uint64_t _decode_varint(uint8_t *buf, uint8_t *skip_bytes) {
+	uint64_t result = 0;
+	(*skip_bytes) = 0;
+	uint64_t val;
+	do {
+		buf++;
+		val = (*buf) & 0x7f;
+		result |= (val << ((*skip_bytes)*7));
+		(*skip_bytes)++;
+	} while ((*buf) & 0x80);
+
+	(*skip_bytes)++;
+	return result;
+}
+
+void bin_addr_to_displayable_chars(uint8_t addr[21], char* out) {
+	size_t i;
+	for (i = 0; i < 20; i++) {
+		out[i*2] = HEX_DIGITS[(addr[i]>>4) & 0x0f];
+		out[i*2+1] = HEX_DIGITS[addr[i] & 0x0f];
+	}
+	out[i*2] = '\0';
 }

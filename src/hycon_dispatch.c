@@ -21,10 +21,6 @@
 #include "os.h"
 #include "os_io_seproxyhal.h"
 
-#include "pb_encode.h"
-#include "pb_decode.h"
-#include "tx.pb.h"
-
 #include "ui.h"
 #include "hycon_constants.h"
 #include "ram_variables.h"
@@ -41,15 +37,13 @@ void handleApdu(volatile unsigned int *flags, volatile unsigned int *tx) {
 			switch (G_io_apdu_buffer[ISO_OFFSET_INS]) {
 			case INS_GET_PUBLIC_KEY:
 				handleGetPublicKey(G_io_apdu_buffer[ISO_OFFSET_P1],
-					G_io_apdu_buffer[ISO_OFFSET_P2],
-					G_io_apdu_buffer + ISO_OFFSET_CDATA,
+					G_io_apdu_buffer[ISO_OFFSET_P2], G_io_apdu_buffer + ISO_OFFSET_CDATA,
 					G_io_apdu_buffer[ISO_OFFSET_LC], flags, tx);
 				break;
 
 			case INS_SIGN:
 				handleSign(G_io_apdu_buffer[ISO_OFFSET_P1],
-					G_io_apdu_buffer[ISO_OFFSET_P2],
-					G_io_apdu_buffer + ISO_OFFSET_CDATA,
+					G_io_apdu_buffer[ISO_OFFSET_P2], G_io_apdu_buffer + ISO_OFFSET_CDATA,
 					G_io_apdu_buffer[ISO_OFFSET_LC], flags, tx);
 				break;
 
@@ -69,7 +63,6 @@ void handleApdu(volatile unsigned int *flags, volatile unsigned int *tx) {
 		case 0x6000:
 			// Wipe the transaction context and report the exception
 			sw = e;
-			os_memset(&G_tx_content, 0, sizeof(G_tx_content));
 			break;
 		case HYCON_SW_OK:
 			// All is well
@@ -112,26 +105,14 @@ void handleSign(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
 	}
 
 	uint8_t msg_length = *(data_buffer++);
-	pb_istream_t stream = pb_istream_from_buffer(data_buffer, msg_length);
-	Tx tx_content = Tx_init_zero;
 
-	//TODO: fix pb_decode (it gets stuck at runtime!)
-	if (1/*pb_decode(&stream, Tx_fields, &tx_content)*/) {
+	hycon_tx tx_content = HYCON_TX_INIT_ZERO;
+	bool status = decode_tx(data_buffer, &tx_content);
+	if (status) {
 		// UI variables setting
 		int_to_displayable_chars(tx_content.amount, G_amount);
 		int_to_displayable_chars(tx_content.fee, G_fee);
-
-		//TODO: address to dispayable chars
-		// get full address
-		/*if (pb_decode(&stream, &Tx_fields[1], G_full_address)) {
-			G_full_address[4] = '\0';
-		} else {
-			G_full_address[0] = 'T';
-			G_full_address[1] = 'E';
-			G_full_address[2] = 'S';
-			G_full_address[3] = 'T';
-			G_full_address[4] = '\0';
-		}*/
+		bin_addr_to_displayable_chars(tx_content.to, G_full_address);
 
 		// hash tx
 		blake2b(G_tx_hash, sizeof(G_tx_hash), data_buffer,

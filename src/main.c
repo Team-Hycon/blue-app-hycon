@@ -63,7 +63,6 @@ void app_main() {
 				case 0x6000:
 					// Wipe the transaction context and report the exception
 					sw = e;
-					os_memset(&G_tx_content, 0, sizeof(G_tx_content));
 					break;
 				case 0x9000:
 					// All is well

@@ -41,7 +41,6 @@ volatile char G_fee[21];
 unsigned char G_io_seproxyhal_spi_buffer[IO_SEPROXYHAL_BUFFER_SIZE_B];
 
 blake2b_state G_blake2b_state;
-Tx G_tx_content;
 hycon_hash_t G_tx_hash;
 uint8_t G_bip32_path_length;
 uint32_t G_bip32_path[MAX_BIP32_PATH];

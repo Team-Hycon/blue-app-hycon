@@ -19,8 +19,6 @@
 #include "ui.h"
 #include "glyphs.h"
 #include "ram_variables.h"
-#include "pb_encode.h"
-#include "pb_decode.h"
 
 void ui_idle(void) {
 	ux_step = 0;
