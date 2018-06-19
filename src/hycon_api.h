@@ -50,7 +50,7 @@ void int_to_displayable_chars(uint64_t number, char *out);
 /* ---                            Others                                 --- */
 /* ------------------------------------------------------------------------- */
 
-bool decode_tx(uint8_t *buf, hycon_tx *tx_content);
+bool decode_tx(uint8_t *data, size_t data_len, hycon_tx *tx_content);
 void bin_addr_to_displayable_chars(uint8_t addr[21], char* out);
 
 #endif 	// HYCON_API_H

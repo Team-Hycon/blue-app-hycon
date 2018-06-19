@@ -78,26 +78,46 @@ void int_to_displayable_chars(uint64_t number, char *out) {
 	out[j] = '\0';
 }
 
-// TODO: verify field number and type
-bool decode_tx(uint8_t *buf, hycon_tx *tx_content) {
-	size_t i;
-	size_t len;
-
-	// TO
-	buf++;	// intentional skip
-	len = *(buf++);
-	for (i = 0; i < len; i++) {
-		tx_content->to[i] = *(buf++);
-	}
-	tx_content->to[i] = '\0';
-
-	// AMOUNT
+bool decode_tx(uint8_t *data, size_t data_len, hycon_tx *tx_content) {
+	size_t idx = 0;
+	size_t len, i;
 	uint8_t skip_bytes;
-	tx_content->amount = _decode_varint(buf, &skip_bytes);
 
-	// FEE
-	buf+=skip_bytes;
-	tx_content->fee = _decode_varint(buf, &skip_bytes);
+	while (idx < data_len) {
+		switch ((data[idx] & 0x38)>>3) {	// field number
+		case 0:	// shouldn't exist!
+			return false;
+		case 1:	// to
+			if (data[idx] & 0x7 != 2) return false;	// type doesn't match
+			if (idx + 1 >= data_len) return false;	// overflow
+			//TODO: from should be same with our address
+			idx += data[idx + 1] + 2;	// skip from address
+			break;
+		case 2:	// from
+			if (data[idx] & 0x7 != 2) return false;	// type doesn't match
+			if (idx + 1 >= data_len) return false;	// overflow
+			idx++;
+			len = data[idx++];
+			if (idx + len >= data_len) return false;	// overflow
+			for (i = 0; i < len; i++) {
+				tx_content->to[i] = data[idx++];
+			}
+			tx_content->to[i] = '\0';
+			break;
+		case 3:	// amount
+			if (data[idx] & 0x7 != 0) return false;	// type doesn't match
+			tx_content->amount = _decode_varint(&data[idx], &skip_bytes);
+			idx += skip_bytes;
+			break;
+		case 4:	// fee
+			if (data[idx] & 0x7 != 0) return false;	// type doesn't match
+			tx_content->fee = _decode_varint(&data[idx], &skip_bytes);
+			idx += skip_bytes;
+			break;
+		default:	// ignore other fields
+			return true;
+		}
+	}
 
 	return true;
 }

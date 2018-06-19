@@ -105,10 +105,8 @@ void handleSign(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
 	}
 
 	uint8_t msg_length = *(data_buffer++);
-
 	hycon_tx tx_content = HYCON_TX_INIT_ZERO;
-	bool status = decode_tx(data_buffer, &tx_content);
-	if (status) {
+	if (decode_tx(data_buffer, msg_length, &tx_content)) {
 		// UI variables setting
 		int_to_displayable_chars(tx_content.amount, G_amount);
 		int_to_displayable_chars(tx_content.fee, G_fee);
