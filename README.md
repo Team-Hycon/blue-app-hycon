@@ -14,10 +14,33 @@ Setup followings according to [Ledger documentation](https://ledger.readthedocs.
 2. BOLOS SDK
 3. BOLOS Python Loader
 
-## Running the tests
+And to run unit tests [check](https://libcheck.github.io/check/) needs to be installed.
+
+## Running demos
 
 You can run python scripts from `/demo` directory to test signing transactions or retrieving public key.  
-For example: `python -m demo-get-pubkey`
+For example:
+```Shell
+$ python -m demo-get-pubkey
+HID => e002000015058000002c80000575800000000000000000000000
+HID <= 200245c4d74989f42ebba2fa8ffaf61728aee261ea3e6567ca0562e1d547f16f9d14db6612b309d257a2aebd59b7445a900ed775d9209000
+Public key 0245c4d74989f42ebba2fa8ffaf61728aee261ea3e6567ca0562e1d547f16f9d
+Address 0xdb6612b309d257a2aebd59b7445a900ed775d920
+```
+
+## Testing
+
+Run `make test` and see the result.
+
+Example output (successful):
+```Shell
+Running suite(s): Protobuf
+100%: Checks: 2, Failures: 0, Errors: 0
+tests/check_hash.o
+Running suite(s): Hash
+100%: Checks: 1, Failures: 0, Errors: 0
+```
+Run `make test_clean` after running tests to clean created files.
 
 ## Issues & Pull Requests
 

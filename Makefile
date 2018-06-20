@@ -112,3 +112,20 @@ include $(BOLOS_SDK)/Makefile.rules
 
 # add dependency on custom makefile filename
 dep/%.d: %.c Makefile
+
+
+TEST_LDFLAGS = -O3 -Os -w
+TEST_LDLIBS = -lgcc -lc -lcheck -pthread -lcheck_pic -lrt -lm
+TEST_LD = gcc
+TEST_SOURCE_PATH = tests
+TEST_COMMON_SOURCES = blake2b/blake2b-ref.c src/hycon_helpers.c src/ram_variables.c
+
+test:
+	$(TEST_LD) -o $(TEST_SOURCE_PATH)/check_hash.o $(TEST_SOURCE_PATH)/check_hash.c $(TEST_COMMON_SOURCES) $(TEST_LDFLAGS) $(TEST_LDLIBS) -DUNIT_TEST
+	$(TEST_LD) -o $(TEST_SOURCE_PATH)/check_protobuf.o $(TEST_SOURCE_PATH)/check_protobuf.c $(TEST_COMMON_SOURCES) $(TEST_LDFLAGS) $(TEST_LDLIBS) -DUNIT_TEST
+
+	$(TEST_SOURCE_PATH)/check_protobuf.o
+	$(TEST_SOURCE_PATH)/check_hash.o
+
+test_clean:
+	rm -rf $(TEST_SOURCE_PATH)/check_hash.o $(TEST_SOURCE_PATH)/check_protobuf.o
