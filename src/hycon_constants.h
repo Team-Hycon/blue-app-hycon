@@ -1,5 +1,5 @@
 /******************************************************************************
-*   $HYCON Wallet for Ledger Nano S
+*   HYCON Wallet for Ledger Nano S
 *   (c) 2018 Dulguun Batmunkh
 *   (c) 2018 Hycon
 *
@@ -82,6 +82,7 @@
 /* ---                            OTHERS                                 --- */
 /* ------------------------------------------------------------------------- */
 
-static const uint8_t const HEX_DIGITS[] = "0123456789ABCDEF";
+static const uint8_t BASE58_ALPHABET[] = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+#define HYC_TO_MINIMUM_AMOUNT 9
 
 #endif  // HYCON_CONSTANTS_H

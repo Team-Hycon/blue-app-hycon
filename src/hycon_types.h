@@ -1,5 +1,5 @@
 /******************************************************************************
-*   $HYCON Wallet for Ledger Nano S
+*   HYCON Wallet for Ledger Nano S
 *   (c) 2018 Dulguun Batmunkh
 *   (c) 2018 Hycon
 *
@@ -19,16 +19,17 @@
 #ifndef HYCON_TYPES_H
 #define HYCON_TYPES_H
 
+#ifdef UNIT_TEST
+#include <stdint.h>
+#include <stdlib.h>
+#else
 #include "os.h"
-#include <stdbool.h>
+#endif
 
+#include <stdbool.h>
 #include "hycon_constants.h"
 
 typedef uint8_t hycon_hash_t[32];
-typedef uint8_t hycon_address_t[32];
-typedef uint8_t hycon_amount_t[32];
-typedef uint8_t hycon_nonce_t[32];
-
 enum UI_STATE { UI_IDLE, UI_VERIFY };
 
 typedef struct hycon_tx_s {

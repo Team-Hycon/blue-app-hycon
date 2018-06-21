@@ -1,5 +1,5 @@
 /******************************************************************************
-*   $HYCON Wallet for Ledger Nano S
+*   HYCON Wallet for Ledger Nano S
 *   (c) 2018 Dulguun Batmunkh
 *   (c) 2018 Hycon
 *
@@ -108,9 +108,9 @@ void handleSign(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
 	hycon_tx tx_content = HYCON_TX_INIT_ZERO;
 	if (decode_tx(data_buffer, msg_length, &tx_content)) {
 		// UI variables setting
-		int_to_displayable_chars(tx_content.amount, G_amount);
-		int_to_displayable_chars(tx_content.fee, G_fee);
-		bin_addr_to_displayable_chars(tx_content.to, G_full_address);
+		coin_amount_to_displayable_chars(tx_content.amount, G_amount);
+		coin_amount_to_displayable_chars(tx_content.fee, G_fee);
+		bin_addr_to_hycon_address(tx_content.to, G_full_address);
 
 		// hash tx
 		blake2b(G_tx_hash, sizeof(G_tx_hash), data_buffer,

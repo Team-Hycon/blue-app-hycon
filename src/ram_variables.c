@@ -1,5 +1,5 @@
 /******************************************************************************
-*   $HYCON Wallet for Ledger Nano S
+*   HYCON Wallet for Ledger Nano S
 *   (c) 2018 Dulguun Batmunkh
 *   (c) 2018 Hycon
 *
@@ -22,23 +22,27 @@
 /* ---                           UI VARIABLES                            --- */
 /* ------------------------------------------------------------------------- */
 
+#ifndef UNIT_TEST
 ux_state_t ux;
+#endif
 
 unsigned int ux_step;
 unsigned int ux_step_count;
 enum UI_STATE G_ui_state;
 
 unsigned char G_public_key_value[65];
-volatile char G_amount[21];
+volatile char G_amount[22];
 volatile char G_full_address[43];
-volatile char G_fee[21];
+volatile char G_fee[22];
 
 /* ------------------------------------------------------------------------- */
 /* ---                     CRYPTOGRAPHY VARIABLES                        --- */
 /* ------------------------------------------------------------------------- */
 
+#ifndef UNIT_TEST
 /** IO buffer to communicate with the outside world. */
 unsigned char G_io_seproxyhal_spi_buffer[IO_SEPROXYHAL_BUFFER_SIZE_B];
+#endif
 
 blake2b_state G_blake2b_state;
 hycon_hash_t G_tx_hash;

@@ -1,5 +1,5 @@
 /******************************************************************************
-*   $HYCON Wallet for Ledger Nano S
+*   HYCON Wallet for Ledger Nano S
 *   (c) 2018 Dulguun Batmunkh
 *   (c) 2018 Hycon
 *

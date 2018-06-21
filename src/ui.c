@@ -1,5 +1,5 @@
 /******************************************************************************
-*   $HYCON Wallet for Ledger Nano S
+*   HYCON Wallet for Ledger Nano S
 *   (c) 2018 Dulguun Batmunkh
 *   (c) 2018 Hycon
 *
@@ -60,7 +60,7 @@ unsigned int ui_approval_prepro(const bagl_element_t *element) {
 				break;
 			case 3:
 				UX_CALLBACK_SET_INTERVAL(MAX(
-					3000, 1000 + bagl_label_roundtrip_duration_ms(element, 7)));
+					4000, 2000 + bagl_label_roundtrip_duration_ms(element, 7)));
 				break;
 			case 4:
 				UX_CALLBACK_SET_INTERVAL(MAX(
