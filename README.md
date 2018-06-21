@@ -44,8 +44,8 @@ Run `make test_clean` after running tests to clean created files.
 
 ## Issues & Pull Requests
 
-If you have an issue, feel free to add it to the [Issues]() tab.
-If you'd like to help us out, the [Pull Request]() tab is a great place to start.
+If you have an issue, feel free to add it to the [Issues](https://github.com/Team-Hycon/blue-app-hycon/issues) tab.
+If you'd like to help us out, the [Pull Request](https://github.com/Team-Hycon/blue-app-hycon/pulls) tab is a great place to start.
 
 **If you have found a security bug, please contact us at [security@glosfer.com](security@glosfer.com).**
 
