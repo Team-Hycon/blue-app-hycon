@@ -48,11 +48,17 @@ uint32_t set_result_publicKey(cx_ecfp_public_key_t public_key) {
 	os_memmove(G_io_apdu_buffer + tx, tmp_pub_key, 32);
 	tx += 32;
 
-	uint8_t address[21];
-	get_address_string_from_key(public_key, address);
+	uint8_t hex_address[21];
+	get_address_string_from_key(public_key, hex_address);
 	G_io_apdu_buffer[tx++] = 20;
-	os_memmove(G_io_apdu_buffer + tx, address, 20);
+	os_memmove(G_io_apdu_buffer + tx, hex_address, 20);
 	tx += 20;
+
+	uint8_t string_address[50];
+	size_t len = bin_addr_to_hycon_address(hex_address, string_address);
+	G_io_apdu_buffer[tx++] = len;
+	os_memmove(G_io_apdu_buffer + tx, string_address, len);
+	tx += len;
 
 	return tx;
 }
@@ -78,7 +84,7 @@ void coin_amount_to_displayable_chars(uint64_t number, char *out) {
 
 	// handle right of decimal point
 	while (zero_count--) {
-		tmp[i] = number%10;
+		tmp[i] = number%10 + '0';
 		i++;
 		number/=10;
 	}
@@ -90,18 +96,14 @@ void coin_amount_to_displayable_chars(uint64_t number, char *out) {
 
 	// handle left of decimal point
 	do {
-		tmp[i] = number%10;
+		tmp[i] = number%10 + '0';
 		i++;
 	} while (number /= 10);
 
 	// reverse array
 	size_t j = 0;
-	while (i) {
-		i--;
-		if (tmp[i] != '.')
-			out[j] = tmp[i] + '0';
-		else
-			out[j] = tmp[i];
+	while (i--) {
+		out[j] = tmp[i];
 		j++;
 	}
 
@@ -138,11 +140,13 @@ bool decode_tx(uint8_t *data, size_t data_len, hycon_tx *tx_content) {
 			break;
 		case 3:	// amount
 			if ((data[idx] & 0x7) != 0) return false;	// type doesn't match
+			idx++;
 			tx_content->amount = decode_varint(&data[idx], &skip_bytes);
 			idx += skip_bytes;
 			break;
 		case 4:	// fee
 			if ((data[idx] & 0x7) != 0) return false;	// type doesn't match
+			idx++;
 			tx_content->fee = decode_varint(&data[idx], &skip_bytes);
 			idx += skip_bytes;
 			break;
@@ -154,26 +158,27 @@ bool decode_tx(uint8_t *data, size_t data_len, hycon_tx *tx_content) {
 	return true;
 }
 
-void bin_addr_to_hycon_address(uint8_t addr[21], char* out) {
+size_t bin_addr_to_hycon_address(uint8_t addr[21], char* out) {
 	out[0] = 'H';
 	size_t encode_len = base58_encode(&out[1], addr, 20);
 	size_t check_sum_len = check_sum(&out[encode_len+1], addr, 20);
 	out[encode_len + check_sum_len + 1] = '\0';
+
+	return encode_len + check_sum_len + 1;
 }
 
-uint64_t decode_varint(uint8_t *buf, uint8_t *skip_bytes) {
+uint64_t decode_varint(const uint8_t *buf, uint8_t *skip_bytes) {
 	uint64_t result = 0;
-	(*skip_bytes) = 0;
 	uint64_t val;
+	uint8_t idx = 0;
 
 	do {
-		buf++;
-		val = (*buf) & 0x7f;
-		result |= (val << ((*skip_bytes)*7));
-		(*skip_bytes)++;
-	} while ((*buf) & 0x80);
+		val = buf[idx] & 0x7f;
+		result |= (val << (idx*7));
+		idx++;
+	} while (buf[idx-1] & 0x80);
 
-	(*skip_bytes)++;
+	(*skip_bytes) = idx;
 	return result;
 }
 
@@ -232,4 +237,10 @@ size_t check_sum(char *out, const void *data, size_t data_len) {
 	os_memcpy(out, tmp, len);
 
 	return len;
+}
+
+uint8_t min(uint8_t a, uint8_t b) {
+	if (a < b)
+		return a;
+	return b;
 }

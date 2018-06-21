@@ -63,6 +63,7 @@ void handleApdu(volatile unsigned int *flags, volatile unsigned int *tx) {
 		case 0x6000:
 			// Wipe the transaction context and report the exception
 			sw = e;
+			os_memset(&G_ram, 0, sizeof(G_ram));
 			break;
 		case HYCON_SW_OK:
 			// All is well
@@ -91,30 +92,61 @@ void handleSign(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
 	UNUSED(data_length);
 	uint8_t i;
 	G_bip32_path_length = *(data_buffer++);
+
 	if ((G_bip32_path_length < 0x01) || (G_bip32_path_length > MAX_BIP32_PATH)) {
 		THROW(HYCON_SW_INCORRECT_DATA);
 	}
-	if ((p1 != P1_CONFIRM) && (p1 != P1_NON_CONFIRM)) {
-		THROW(HYCON_SW_INCORRECT_P1_P2);
+
+	if (p1 == P1_FIRST) {
+		for (i = 0; i < G_bip32_path_length; i++) {
+			G_bip32_path[i] = (data_buffer[0] << 24) | (data_buffer[1] << 16) |
+				(data_buffer[2] << 8) | (data_buffer[3]);
+			data_buffer += 4;
+		}
+
+		os_memset(&G_ram, 0, sizeof(G_ram));
+		G_ram.total_data_len = *(data_buffer++);
+		G_ram.remaining_data_len = G_ram.total_data_len - 18;
+		G_ram.is_correct_order = true;
+		os_memcpy(G_ram.encoded_tx, data_buffer,
+			min(G_ram.total_data_len, MAX_APDU_LEN-18));
+		G_ram.offset = min(G_ram.total_data_len, MAX_APDU_LEN-18);
+	} else if (p1 != P1_MORE) {
+		return THROW(HYCON_SW_INCORRECT_P1_P2);
 	}
 
-	for (i = 0; i < G_bip32_path_length; i++) {
-		G_bip32_path[i] = (data_buffer[0] << 24) | (data_buffer[1] << 16) |
-			(data_buffer[2] << 8) | (data_buffer[3]);
-		data_buffer += 4;
+	if (!G_ram.is_correct_order) {	// P1_FIRST should come first
+		return THROW(HYCON_SW_INCORRECT_P1_P2);
 	}
 
-	uint8_t msg_length = *(data_buffer++);
+	if (p1 == P1_MORE) {
+		os_memcpy(G_ram.encoded_tx + G_ram.offset, data_buffer,
+			min(G_ram.total_data_len, MAX_APDU_LEN-18));
+		G_ram.offset +=
+			min(MAX_APDU_LEN, G_ram.remaining_data_len);
+	}
+
+	G_ram.remaining_data_len -=
+		min(G_ram.remaining_data_len, MAX_APDU_LEN);
+
+	if (G_ram.remaining_data_len != 0) {
+		THROW(HYCON_SW_OK);
+	}
+
+	// all data has been received
+	// now it is safe to start decoding
 	hycon_tx tx_content = HYCON_TX_INIT_ZERO;
-	if (decode_tx(data_buffer, msg_length, &tx_content)) {
+	if (decode_tx(G_ram.encoded_tx, G_ram.total_data_len,
+		&tx_content))
+	{
 		// UI variables setting
-		coin_amount_to_displayable_chars(tx_content.amount, G_amount);
-		coin_amount_to_displayable_chars(tx_content.fee, G_fee);
-		bin_addr_to_hycon_address(tx_content.to, G_full_address);
+		coin_amount_to_displayable_chars(tx_content.amount, G_ram.ui_amount);
+		coin_amount_to_displayable_chars(tx_content.fee, G_ram.ui_fee);
+		bin_addr_to_hycon_address(tx_content.to, G_ram.ui_full_address);
 
 		// hash tx
-		blake2b(G_tx_hash, sizeof(G_tx_hash), data_buffer,
-			msg_length, &G_blake2b_state, 0);
+		blake2b(G_tx_hash, sizeof(G_tx_hash), G_ram.encoded_tx,
+			G_ram.total_data_len, &G_blake2b_state, 0);
 
 		ux_step = 0;
 		ux_step_count = 4;
@@ -144,6 +176,8 @@ void handleGetPublicKey(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
 	if ((p1 != P1_CONFIRM) && (p1 != P1_NON_CONFIRM)) {
 		THROW(HYCON_SW_INCORRECT_P1_P2);
 	}
+
+	os_memset(&G_ram, 0, sizeof(G_ram));
 
 	for (i = 0; i < bip32PathLength; i++) {
 		bip32Path[i] = (data_buffer[0] << 24) | (data_buffer[1] << 16) |

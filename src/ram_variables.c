@@ -31,9 +31,6 @@ unsigned int ux_step_count;
 enum UI_STATE G_ui_state;
 
 unsigned char G_public_key_value[65];
-volatile char G_amount[22];
-volatile char G_full_address[43];
-volatile char G_fee[22];
 
 /* ------------------------------------------------------------------------- */
 /* ---                     CRYPTOGRAPHY VARIABLES                        --- */
@@ -48,3 +45,9 @@ blake2b_state G_blake2b_state;
 hycon_hash_t G_tx_hash;
 uint8_t G_bip32_path_length;
 uint32_t G_bip32_path[MAX_BIP32_PATH];
+
+/* ------------------------------------------------------------------------- */
+/* ---                              OTHERS                               --- */
+/* ------------------------------------------------------------------------- */
+
+ram G_ram;

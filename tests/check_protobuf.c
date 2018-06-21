@@ -32,7 +32,7 @@ END_TEST
 
 START_TEST(test_displayable_amount_conversion)
 {
-	char displayed_amount[21];
+	char displayed_amount[22];
 	coin_amount_to_displayable_chars((uint64_t)100, displayed_amount);
 	ck_assert_str_eq(displayed_amount, "0.0000001");
 
@@ -56,8 +56,33 @@ START_TEST(test_displayable_amount_conversion)
 
 	coin_amount_to_displayable_chars((uint64_t)18446744073709551615, displayed_amount);
 	ck_assert_str_eq(displayed_amount, "18446744073.709551615");
+
 	coin_amount_to_displayable_chars((uint64_t)18446744073000000000, displayed_amount);
 	ck_assert_str_eq(displayed_amount, "18446744073");
+
+	coin_amount_to_displayable_chars((uint64_t)123456789123456789, displayed_amount);
+	ck_assert_str_eq(displayed_amount, "123456789.123456789");
+
+	coin_amount_to_displayable_chars((uint64_t)123456789100000000, displayed_amount);
+	ck_assert_str_eq(displayed_amount, "123456789.1");
+
+	coin_amount_to_displayable_chars((uint64_t)123456789000000000, displayed_amount);
+	ck_assert_str_eq(displayed_amount, "123456789");
+}
+END_TEST
+
+START_TEST(test_decode_varint)
+{
+	uint8_t skip_bytes;
+	uint64_t decoded_amount;
+
+	uint8_t encoded_amount_small[] = {0x90, 0x4e};
+	decoded_amount = decode_varint(encoded_amount_small, &skip_bytes);
+	ck_assert_int_eq(decoded_amount, 10000);
+
+	uint8_t encoded_amount_medium[] = {0x95, 0xbe, 0xc3, 0x8b, 0xa8, 0xee, 0x67};
+	decoded_amount = decode_varint(encoded_amount_medium, &skip_bytes);
+	ck_assert_int_eq(decoded_amount, 456789123456789);
 }
 END_TEST
 
@@ -90,6 +115,7 @@ Suite *hash_suite(void)
 	tc = tcase_create("Test case");
 
 	tcase_add_checked_fixture(tc, setup, teardown);
+	tcase_add_test(tc, test_decode_varint);
 	tcase_add_test(tc, test_protobuf_small);
 	tcase_add_test(tc, test_protobuf_medium);
 	tcase_add_test(tc, test_displayable_amount_conversion);

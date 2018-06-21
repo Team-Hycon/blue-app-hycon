@@ -33,15 +33,25 @@ typedef uint8_t hycon_hash_t[32];
 enum UI_STATE { UI_IDLE, UI_VERIFY };
 
 typedef struct hycon_tx_s {
-	uint8_t from[21];
 	uint8_t to[21];
 	uint64_t amount;
 	uint64_t fee;
 	uint32_t nonce;
-	uint8_t signature[21];
-	uint32_t recovery;
 } hycon_tx;
 
 #define HYCON_TX_INIT_ZERO {NULL, NULL, 0, 0, 0, NULL, 0}
+
+typedef struct ram_s {
+	uint8_t encoded_tx[MAX_ENCODED_TX_LEN];
+	bool is_correct_order;
+	uint8_t total_data_len;
+	uint8_t remaining_data_len;
+	uint8_t offset;
+
+	// UI
+	volatile char ui_amount[22];
+	volatile char ui_fee[22];
+	volatile char ui_full_address[50];
+} ram;
 
 #endif // HYCON_TYPES_H

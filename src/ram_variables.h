@@ -38,9 +38,6 @@ extern unsigned int ux_step;
 extern unsigned int ux_step_count;
 
 extern unsigned char G_public_key_value[65];
-extern volatile char G_amount[22];
-extern volatile char G_full_address[43];
-extern volatile char G_fee[22];
 
 extern enum UI_STATE G_ui_state;
 
@@ -57,5 +54,11 @@ extern hycon_hash_t G_tx_hash;
 extern uint8_t G_bip32_path_length;
 extern uint32_t G_bip32_path[MAX_BIP32_PATH];
 extern blake2b_state G_blake2b_state;
+
+/* ------------------------------------------------------------------------- */
+/* ---                              OTHERS                               --- */
+/* ------------------------------------------------------------------------- */
+
+extern ram G_ram;
 
 #endif // RAM_VARIABLES_H

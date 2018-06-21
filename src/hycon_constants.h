@@ -77,6 +77,7 @@
 #define CLA 0xE0
 
 #define MAX_BIP32_PATH 10
+#define MAX_APDU_LEN 255
 
 /* ------------------------------------------------------------------------- */
 /* ---                            OTHERS                                 --- */
@@ -84,5 +85,6 @@
 
 static const uint8_t BASE58_ALPHABET[] = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 #define HYC_TO_MINIMUM_AMOUNT 9
+#define MAX_ENCODED_TX_LEN 512
 
 #endif  // HYCON_CONSTANTS_H

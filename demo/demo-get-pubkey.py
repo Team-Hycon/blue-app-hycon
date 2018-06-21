@@ -39,7 +39,10 @@ dongle = getDongle(True)
 result = dongle.exchange(bytes(apdu))
 
 offset = 1 + result[0]
-address = result[offset + 1 : offset + 1 + result[offset]]
+hex_address = result[offset + 1 : offset + 1 + result[offset]]
+offset = offset + 1 + result[offset]
+hycon_address = result[offset + 1 : offset + 1 + result[offset]]
 
-print ("Public key " + binascii.hexlify(bytearray(result[1 : 1 + result[0]])).decode('ascii'))
-print ("Address 0x" + binascii.hexlify(address).decode('ascii'))
+print ("Public key = " + binascii.hexlify(bytearray(result[1 : 1 + result[0]])).decode('ascii'))
+print ("Hex Address = 0x" + binascii.hexlify(hex_address).decode('ascii'))
+print ("Hycon Address = " + (hycon_address).decode('ascii'))

@@ -62,10 +62,11 @@ uint32_t set_result_publicKey(cx_ecfp_public_key_t publicKey);
 /* ------------------------------------------------------------------------- */
 
 bool decode_tx(uint8_t *data, size_t data_len, hycon_tx *tx_content);
-void bin_addr_to_hycon_address(uint8_t addr[21], char* out);
+size_t bin_addr_to_hycon_address(uint8_t addr[21], char* out);
 
-uint64_t decode_varint(uint8_t *buf, uint8_t *skip_bytes);
+uint64_t decode_varint(const uint8_t *buf, uint8_t *skip_bytes);
 size_t base58_encode(char *out, const void *data, size_t data_len);
 size_t check_sum(char *out, const void *data, size_t data_len);
+uint8_t min(uint8_t a, uint8_t b);
 
 #endif 	// HYCON_API_H

@@ -63,6 +63,7 @@ void app_main() {
 				case 0x6000:
 					// Wipe the transaction context and report the exception
 					sw = e;
+					os_memset(&G_ram, 0, sizeof(G_ram));
 					break;
 				case 0x9000:
 					// All is well
@@ -192,11 +193,14 @@ __attribute__((section(".boot"))) int main(void) {
 	// exit critical section
 	__asm volatile ("cpsie i");
 
-	// ensure exception will work as planned
-	os_boot();
+	os_memset(&G_ram, 0, sizeof(G_ram));
 
 	for (;;) {
 		UX_INIT();
+
+		// ensure exception will work as planned
+		os_boot();
+
 		BEGIN_TRY {
 			TRY {
 				io_seproxyhal_init();
