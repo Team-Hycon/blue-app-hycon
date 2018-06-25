@@ -33,20 +33,20 @@ void get_address_string_from_key(const cx_ecfp_public_key_t public_key,
 	unsigned char tmp_pub_key[65];
 	get_compressed_public_key_value(public_key.W, tmp_pub_key);
 
-	blake2b(hash_address, sizeof(hycon_hash_t), tmp_pub_key, 32, &G_blake2b_state, 0);
+	blake2b(hash_address, sizeof(hycon_hash_t), tmp_pub_key, COMPRESSED_PUB_KEY_LEN, &G_blake2b_state, 0);
 
 	os_memmove(out, hash_address + 12, 20);
 }
 
 uint32_t set_result_publicKey(cx_ecfp_public_key_t public_key) {
 	uint32_t tx = 0;
-	G_io_apdu_buffer[tx++] = 32;
+	G_io_apdu_buffer[tx++] = COMPRESSED_PUB_KEY_LEN;
 
 	// Compressed public key
 	unsigned char tmp_pub_key[65];
 	get_compressed_public_key_value(public_key.W, tmp_pub_key);
-	os_memmove(G_io_apdu_buffer + tx, tmp_pub_key, 32);
-	tx += 32;
+	os_memmove(G_io_apdu_buffer + tx, tmp_pub_key, COMPRESSED_PUB_KEY_LEN);
+	tx += COMPRESSED_PUB_KEY_LEN;
 
 	uint8_t hex_address[21];
 	get_address_string_from_key(public_key, hex_address);

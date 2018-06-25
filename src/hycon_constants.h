@@ -86,5 +86,6 @@
 static const uint8_t BASE58_ALPHABET[] = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 #define HYC_TO_MINIMUM_AMOUNT 9
 #define MAX_ENCODED_TX_LEN 512
+#define COMPRESSED_PUB_KEY_LEN 33
 
 #endif  // HYCON_CONSTANTS_H
