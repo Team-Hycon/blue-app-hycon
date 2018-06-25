@@ -366,13 +366,16 @@ unsigned int io_seproxyhal_touch_tx_ok(const bagl_element_t *e) {
 		CX_SHA256, G_tx_hash, sizeof(G_tx_hash), signature, 6+2*(32+1), &info);
 	os_memset(&privateKey, 0, sizeof(privateKey));
 
-	G_io_apdu_buffer[0] = 31 + (signature[0] & 0x01);	// compressed public key
+	if (info & CX_ECCINFO_PARITY_ODD)
+		signature[0] |= 0x01;
+
+	G_io_apdu_buffer[0] = signature[0] & 0x01;
 	r_length = signature[3];
 	s_length = signature[4 + r_length + 1];
 	r_offset = (r_length == 33 ? 1 : 0);
 	s_offset = (s_length == 33 ? 1 : 0);
 	os_memmove(G_io_apdu_buffer + 1, signature + 4 + r_offset, 32);
-	os_memmove(G_io_apdu_buffer + 1 + 32, signature + 4 + r_length + 2 + r_offset,
+	os_memmove(G_io_apdu_buffer + 1 + 32, signature + 4 + r_length + 2 + s_offset,
 		32);
 	tx = 65;
 	G_io_apdu_buffer[tx++] = 0x90;
