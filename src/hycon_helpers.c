@@ -19,9 +19,9 @@
 #include "hycon_api.h"
 #include "ram_variables.h"
 
-void get_compressed_public_key_value(unsigned char *value, unsigned char *out) {
-	memcpy(out, value, 65);
-	out[0] = ((out[64] & 1) ? 0x03 : 0x02);
+void get_compressed_public_key_value(const unsigned char *in, unsigned char *out) {
+	memcpy(out, in, COMPRESSED_PUB_KEY_LEN);
+	out[0] = ((in[64] & 1) ? 0x03 : 0x02);
 }
 
 #ifndef UNIT_TEST
@@ -30,7 +30,7 @@ void get_address_string_from_key(const cx_ecfp_public_key_t public_key,
 	hycon_hash_t hash_address;
 
 	// Compressed public key
-	unsigned char tmp_pub_key[65];
+	unsigned char tmp_pub_key[COMPRESSED_PUB_KEY_LEN];
 	get_compressed_public_key_value(public_key.W, tmp_pub_key);
 
 	blake2b(hash_address, sizeof(hycon_hash_t), tmp_pub_key, COMPRESSED_PUB_KEY_LEN, &G_blake2b_state, 0);
@@ -38,7 +38,7 @@ void get_address_string_from_key(const cx_ecfp_public_key_t public_key,
 	os_memmove(out, hash_address + 12, 20);
 }
 
-uint32_t set_result_publicKey(cx_ecfp_public_key_t public_key) {
+uint32_t set_result_public_key(cx_ecfp_public_key_t public_key) {
 	uint32_t tx = 0;
 	G_io_apdu_buffer[tx++] = COMPRESSED_PUB_KEY_LEN;
 
@@ -54,7 +54,7 @@ uint32_t set_result_publicKey(cx_ecfp_public_key_t public_key) {
 	os_memmove(G_io_apdu_buffer + tx, hex_address, 20);
 	tx += 20;
 
-	uint8_t string_address[50];
+	char string_address[50];
 	size_t len = bin_addr_to_hycon_address(hex_address, string_address);
 	G_io_apdu_buffer[tx++] = len;
 	os_memmove(G_io_apdu_buffer + tx, string_address, len);
@@ -110,7 +110,8 @@ void coin_amount_to_displayable_chars(uint64_t number, char *out) {
 	out[j] = '\0';
 }
 
-bool decode_tx(uint8_t *data, size_t data_len, hycon_tx *tx_content) {
+// Uses protobuf rules to decode
+bool decode_tx(const uint8_t *data, size_t data_len, hycon_tx *tx_content) {
 	size_t idx = 0;
 	size_t len, i;
 	uint8_t skip_bytes;
@@ -158,7 +159,7 @@ bool decode_tx(uint8_t *data, size_t data_len, hycon_tx *tx_content) {
 	return true;
 }
 
-size_t bin_addr_to_hycon_address(uint8_t addr[21], char* out) {
+size_t bin_addr_to_hycon_address(const uint8_t addr[21], char* out) {
 	out[0] = 'H';
 	size_t encode_len = base58_encode(&out[1], addr, 20);
 	size_t check_sum_len = check_sum(&out[encode_len+1], addr, 20);

@@ -89,9 +89,11 @@ void app_main() {
 	return;
 }
 
-/** display function */
+// override point, but nothing more to do
 void io_seproxyhal_display(const bagl_element_t *element) {
-	io_seproxyhal_display_default((bagl_element_t *) element);
+	if ((element->component.type & (~BAGL_TYPE_FLAGS_MASK)) != BAGL_NONE) {
+		io_seproxyhal_display_default((bagl_element_t *)element);
+	}
 }
 
 /* ------------------------------------------------------------------------- */
@@ -128,11 +130,9 @@ unsigned char io_event(unsigned char channel) {
 
 	case SEPROXYHAL_TAG_TICKER_EVENT:
 		UX_TICKER_EVENT(G_io_seproxyhal_spi_buffer, {
-			if (UX_ALLOWED) {
-				if (ux_step_count) {
-					ux_step = (ux_step + 1) % ux_step_count; // prepare next screen
-					UX_REDISPLAY(); // redisplay screen
-				}
+			if (ux_step_count && UX_ALLOWED) {
+				ux_step = (ux_step + 1) % ux_step_count; // prepare next screen
+				UX_REDISPLAY(); // redisplay screen
 			}
 		});
 		break;

@@ -46,7 +46,7 @@ const ux_menu_entry_t menu_about[] = {
 };
 
 unsigned int ui_approval_prepro(const bagl_element_t *element) {
-	unsigned int display = 1;
+	bool display = 1;
 	if (element->component.userid > 0) {
 		display = (ux_step == element->component.userid - 1);
 		if (display) {
@@ -131,7 +131,7 @@ const bagl_element_t ui_approval_nanos[] = {
 	//{{BAGL_ICON                           , 0x01,  21,   9,  14,  14, 0, 0, 0
 	//, 0xFFFFFF, 0x000000, 0, BAGL_GLYPH_ICON_TRANSACTION_BADGE  }, NULL, 0, 0,
 	//0, NULL, NULL, NULL },
-	{{BAGL_LABELINE, 0x01, 0, 12, 128, 32, 0, 0, 0, 0xFFFFFF, 0x000000,
+	{{BAGL_LABELINE, 0x01, 0, 12, 128, 12, 0, 0, 0, 0xFFFFFF, 0x000000,
 		BAGL_FONT_OPEN_SANS_EXTRABOLD_11px | BAGL_FONT_ALIGNMENT_CENTER, 0},
 	"Confirm",
 	0,
@@ -140,7 +140,7 @@ const bagl_element_t ui_approval_nanos[] = {
 	NULL,
 	NULL,
 	NULL},
-	{{BAGL_LABELINE, 0x01, 0, 26, 128, 32, 0, 0, 0, 0xFFFFFF, 0x000000,
+	{{BAGL_LABELINE, 0x01, 0, 26, 128, 12, 0, 0, 0, 0xFFFFFF, 0x000000,
 		BAGL_FONT_OPEN_SANS_EXTRABOLD_11px | BAGL_FONT_ALIGNMENT_CENTER, 0},
 	"transaction",
 	0,
@@ -150,7 +150,7 @@ const bagl_element_t ui_approval_nanos[] = {
 	NULL,
 	NULL},
 
-	{{BAGL_LABELINE, 0x02, 0, 12, 128, 32, 0, 0, 0, 0xFFFFFF, 0x000000,
+	{{BAGL_LABELINE, 0x02, 0, 12, 128, 12, 0, 0, 0, 0xFFFFFF, 0x000000,
 		BAGL_FONT_OPEN_SANS_REGULAR_11px | BAGL_FONT_ALIGNMENT_CENTER, 0},
 	"Amount",
 	0,
@@ -161,7 +161,7 @@ const bagl_element_t ui_approval_nanos[] = {
 	NULL},
 	{{BAGL_LABELINE, 0x02, 23, 26, 82, 12, 0x80 | 10, 0, 0, 0xFFFFFF, 0x000000,
 		BAGL_FONT_OPEN_SANS_EXTRABOLD_11px | BAGL_FONT_ALIGNMENT_CENTER, 26},
-	(char *)G_ram.ui_amount,
+	G_ram.ui_amount,
 	0,
 	0,
 	0,
@@ -169,7 +169,7 @@ const bagl_element_t ui_approval_nanos[] = {
 	NULL,
 	NULL},
 
-	{{BAGL_LABELINE, 0x03, 0, 12, 128, 32, 0, 0, 0, 0xFFFFFF, 0x000000,
+	{{BAGL_LABELINE, 0x03, 0, 12, 128, 12, 0, 0, 0, 0xFFFFFF, 0x000000,
 		BAGL_FONT_OPEN_SANS_REGULAR_11px | BAGL_FONT_ALIGNMENT_CENTER, 0},
 	"Address",
 	0,
@@ -180,7 +180,7 @@ const bagl_element_t ui_approval_nanos[] = {
 	NULL},
 	{{BAGL_LABELINE, 0x03, 23, 26, 82, 12, 0x80 | 10, 0, 0, 0xFFFFFF, 0x000000,
 		BAGL_FONT_OPEN_SANS_EXTRABOLD_11px | BAGL_FONT_ALIGNMENT_CENTER, 50},
-	(char *)G_ram.ui_full_address,
+	G_ram.ui_full_address,
 	0,
 	0,
 	0,
@@ -188,7 +188,7 @@ const bagl_element_t ui_approval_nanos[] = {
 	NULL,
 	NULL},
 
-	{{BAGL_LABELINE, 0x04, 0, 12, 128, 32, 0, 0, 0, 0xFFFFFF, 0x000000,
+	{{BAGL_LABELINE, 0x04, 0, 12, 128, 12, 0, 0, 0, 0xFFFFFF, 0x000000,
 		BAGL_FONT_OPEN_SANS_REGULAR_11px | BAGL_FONT_ALIGNMENT_CENTER, 0},
 	"Fees",
 	0,
@@ -199,7 +199,7 @@ const bagl_element_t ui_approval_nanos[] = {
 	NULL},
 	{{BAGL_LABELINE, 0x04, 23, 26, 82, 12, 0x80 | 10, 0, 0, 0xFFFFFF, 0x000000,
 		BAGL_FONT_OPEN_SANS_EXTRABOLD_11px | BAGL_FONT_ALIGNMENT_CENTER, 26},
-	(char *)G_ram.ui_fee,
+	G_ram.ui_fee,
 	0,
 	0,
 	0,
@@ -292,11 +292,11 @@ const bagl_element_t ui_address_nanos[] = {
 unsigned int ui_approval_nanos_button(unsigned int button_mask,
                                       unsigned int button_mask_counter) {
 	switch (button_mask) {
-	case BUTTON_EVT_RELEASED | BUTTON_LEFT: // CANCEL
+	case BUTTON_EVT_RELEASED | BUTTON_LEFT:	// CANCEL
 		io_seproxyhal_touch_tx_cancel(NULL);
 		break;
 
-	case BUTTON_EVT_RELEASED | BUTTON_RIGHT: // OK
+	case BUTTON_EVT_RELEASED | BUTTON_RIGHT:	// OK
 		io_seproxyhal_touch_tx_ok(NULL);
 		break;
 	}
@@ -307,11 +307,11 @@ unsigned int ui_approval_nanos_button(unsigned int button_mask,
 unsigned int ui_address_nanos_button(unsigned int button_mask,
                                      unsigned int button_mask_counter) {
 	switch (button_mask) {
-	case BUTTON_EVT_RELEASED | BUTTON_LEFT: // CANCEL
+	case BUTTON_EVT_RELEASED | BUTTON_LEFT:	// CANCEL
 		io_seproxyhal_touch_address_cancel(NULL);
 		break;
 
-	case BUTTON_EVT_RELEASED | BUTTON_RIGHT: { // OK
+	case BUTTON_EVT_RELEASED | BUTTON_RIGHT: {	// OK
 		io_seproxyhal_touch_address_ok(NULL);
 		break;
 	}
@@ -324,6 +324,7 @@ unsigned int ui_address_nanos_button(unsigned int button_mask,
 /* ---                           UI LOGICS                               --- */
 /* ------------------------------------------------------------------------- */
 
+//TODO: display public key on display
 unsigned int io_seproxyhal_touch_address_ok(const bagl_element_t *e) {
 	//uint32_t tx = set_result_get_publicKey();
 	G_io_apdu_buffer[0] = 0x90;
@@ -348,23 +349,23 @@ unsigned int io_seproxyhal_touch_address_cancel(const bagl_element_t *e) {
 }
 
 unsigned int io_seproxyhal_touch_tx_ok(const bagl_element_t *e) {
-	uint8_t privateComponent[32];
+	uint8_t private_component[32];
 	uint8_t signature[100];
-	uint8_t signatureLength;
-	cx_ecfp_private_key_t privateKey;
+	uint8_t signature_len;
+	cx_ecfp_private_key_t private_key;
 	uint32_t tx = 0;
 	uint8_t r_length, s_length;
 	uint8_t r_offset, s_offset;
 
-	os_perso_derive_node_bip32(CX_CURVE_256K1, G_bip32_path, G_bip32_path_length,
-		privateComponent, NULL);
-	cx_ecfp_init_private_key(CX_CURVE_256K1, privateComponent, 32, &privateKey);
-	os_memset(privateComponent, 0, sizeof(privateComponent));
+	os_perso_derive_node_bip32(CX_CURVE_256K1, G_bip32_path, G_bip32_path_len,
+		private_component, NULL);
+	cx_ecfp_init_private_key(CX_CURVE_256K1, private_component, 32, &private_key);
+	os_memset(private_component, 0, sizeof(private_component));
 
 	unsigned int info = 0;
-	signatureLength = cx_ecdsa_sign(&privateKey, CX_RND_RFC6979 | CX_LAST,
-		CX_SHA256, G_tx_hash, sizeof(G_tx_hash), signature, 6+2*(32+1), &info);
-	os_memset(&privateKey, 0, sizeof(privateKey));
+	signature_len = cx_ecdsa_sign(&private_key, CX_RND_RFC6979 | CX_LAST,
+		CX_SHA256, G_ram.tx_hash, sizeof(G_ram.tx_hash), signature, 6+2*(32+1), &info);
+	os_memset(&private_key, 0, sizeof(private_key));
 
 	if (info & CX_ECCINFO_PARITY_ODD)
 		signature[0] |= 0x01;

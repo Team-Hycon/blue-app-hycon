@@ -50,8 +50,7 @@ extern enum UI_STATE G_ui_state;
 extern unsigned char G_io_seproxyhal_spi_buffer[IO_SEPROXYHAL_BUFFER_SIZE_B];
 #endif
 
-extern hycon_hash_t G_tx_hash;
-extern uint8_t G_bip32_path_length;
+extern uint8_t G_bip32_path_len;
 extern uint32_t G_bip32_path[MAX_BIP32_PATH];
 extern blake2b_state G_blake2b_state;
 

@@ -32,15 +32,15 @@
 /* ------------------------------------------------------------------------- */
 
 #ifndef UNIT_TEST
-void handleApdu(volatile unsigned int *flags, volatile unsigned int *tx);
-void handleSign(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
-                uint16_t data_length, volatile unsigned int *flags,
+void handle_apdu(volatile unsigned int *flags, volatile unsigned int *tx);
+void handle_sign(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
+                uint8_t data_length, volatile unsigned int *flags,
                 volatile unsigned int *tx);
-void handleGetPublicKey(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
-                        uint16_t data_length, volatile unsigned int *flags,
+void handle_get_public_key(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
+                        uint8_t data_length, volatile unsigned int *flags,
                         volatile unsigned int *tx);
-void handleGetAppConfig(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
-                        uint16_t data_length, volatile unsigned int *flags,
+void handle_get_app_config(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
+                        uint8_t data_length, volatile unsigned int *flags,
                         volatile unsigned int *tx);
 #endif	// UNIT_TEST
 
@@ -48,21 +48,21 @@ void handleGetAppConfig(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
 /* ---                            Cryptography                           --- */
 /* ------------------------------------------------------------------------- */
 
-void get_compressed_public_key_value(unsigned char *value, unsigned char *out);
-void coin_amount_to_displayable_chars(uint64_t number, char *out);
+void get_compressed_public_key_value(const unsigned char *in, unsigned char *out);
 
 #ifndef UNIT_TEST
 void get_address_string_from_key(const cx_ecfp_public_key_t publicKey,
                                  uint8_t *out);
-uint32_t set_result_publicKey(cx_ecfp_public_key_t publicKey);
+uint32_t set_result_public_Key(cx_ecfp_public_key_t publicKey);
 #endif	// UNIT_TEST
 
 /* ------------------------------------------------------------------------- */
 /* ---                            Others                                 --- */
 /* ------------------------------------------------------------------------- */
 
-bool decode_tx(uint8_t *data, size_t data_len, hycon_tx *tx_content);
-size_t bin_addr_to_hycon_address(uint8_t addr[21], char* out);
+bool decode_tx(const uint8_t *data, size_t data_len, hycon_tx *tx_content);
+size_t bin_addr_to_hycon_address(const uint8_t addr[21], char* out);
+void coin_amount_to_displayable_chars(uint64_t number, char *out);
 
 uint64_t decode_varint(const uint8_t *buf, uint8_t *skip_bytes);
 size_t base58_encode(char *out, const void *data, size_t data_len);

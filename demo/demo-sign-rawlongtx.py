@@ -23,28 +23,29 @@ from ledgerblue.comm import getDongle
 from ledgerblue.commException import CommException
 import binascii
 from hyconHelpers import *
-import tx_pb2
 
 bip32_path = "44'/1397'/0'/0/0"
 
-tx = tx_pb2.Tx()
-#tx.from = bytes(bytearray.fromhex("db6612b309d257a2aebd59b7445a900ed775d920"))
-tx.to = bytes(bytearray.fromhex("db6612b309d257a2aebd59b7445a900ed775d921"))
-tx.amount = 2**64 - 1
-tx.fee = 2**64 - 1
-tx.nonce = 2**32 - 1
-
+rawTx = bytes(bytearray.fromhex("0a14e7bc7874eebe21bb4608f4b6b5d52e29ab8fd6011214e161124d4aa41ca0df6bafecb0408971cff6c0961895bec1e6bae9a6db012095bec1e6bae9a6db0128959aef3a"))
 keypath = parse_bip32_path(bip32_path)
-encodedTx = tx.SerializeToString()
 
 apdu = []
 writeUint8BE(0xE0, apdu)	# CLA
 writeUint8BE(0x04, apdu)	# INS (INS_SIGN)
 writeUint8BE(0x00, apdu)	# P1
 writeUint8BE(0x00, apdu)	# P2
-writeUint8BE(len(keypath) + len(encodedTx), apdu)	# LC
+writeUint8BE(len(keypath) + len(rawTx), apdu)	# LC
 apdu.extend(keypath)	# keypath
-apdu.extend(encodedTx)	# encodedTx
+apdu.extend(rawTx)	# encodedTx
+
+"""
+EncodedTx = {
+	toAddress : new Address("H497fHm8gbPZxaXySKpV17a7beYBF9Ut3"),
+	amount : 123456789.123456789,
+	nonce: 123456789,
+	fee: 123456789.123456789
+}
+"""
 
 dongle = getDongle(True)
 result = dongle.exchange(bytes(apdu))

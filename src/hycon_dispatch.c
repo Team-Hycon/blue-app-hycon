@@ -36,20 +36,23 @@ void handleApdu(volatile unsigned int *flags, volatile unsigned int *tx) {
 
 			switch (G_io_apdu_buffer[ISO_OFFSET_INS]) {
 			case INS_GET_PUBLIC_KEY:
-				handleGetPublicKey(G_io_apdu_buffer[ISO_OFFSET_P1],
-					G_io_apdu_buffer[ISO_OFFSET_P2], G_io_apdu_buffer + ISO_OFFSET_CDATA,
+				handle_get_public_key(G_io_apdu_buffer[ISO_OFFSET_P1],
+					G_io_apdu_buffer[ISO_OFFSET_P2],
+					G_io_apdu_buffer + ISO_OFFSET_CDATA,
 					G_io_apdu_buffer[ISO_OFFSET_LC], flags, tx);
 				break;
 
 			case INS_SIGN:
-				handleSign(G_io_apdu_buffer[ISO_OFFSET_P1],
-					G_io_apdu_buffer[ISO_OFFSET_P2], G_io_apdu_buffer + ISO_OFFSET_CDATA,
+				handle_sign(G_io_apdu_buffer[ISO_OFFSET_P1],
+					G_io_apdu_buffer[ISO_OFFSET_P2],
+					G_io_apdu_buffer + ISO_OFFSET_CDATA,
 					G_io_apdu_buffer[ISO_OFFSET_LC], flags, tx);
 				break;
 
 			case INS_GET_APP_CONFIGURATION:
-				handleGetAppConfig(G_io_apdu_buffer[ISO_OFFSET_P1],
-					G_io_apdu_buffer[ISO_OFFSET_P2], G_io_apdu_buffer + ISO_OFFSET_CDATA,
+				handle_get_app_config(G_io_apdu_buffer[ISO_OFFSET_P1],
+					G_io_apdu_buffer[ISO_OFFSET_P2],
+					G_io_apdu_buffer + ISO_OFFSET_CDATA,
 					G_io_apdu_buffer[ISO_OFFSET_LC], flags, tx);
 				break;
 
@@ -85,68 +88,54 @@ void handleApdu(volatile unsigned int *flags, volatile unsigned int *tx) {
 	END_TRY;
 }
 
-void handleSign(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
-                uint16_t data_length, volatile unsigned int *flags,
+void handle_sign(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
+                uint8_t data_len, volatile unsigned int *flags,
                 volatile unsigned int *tx) {
 	UNUSED(tx);
-	UNUSED(data_length);
-	uint8_t i;
-	G_bip32_path_length = *(data_buffer++);
+	G_bip32_path_len = (*data_buffer++);
+	data_len--;
 
-	if ((G_bip32_path_length < 0x01) || (G_bip32_path_length > MAX_BIP32_PATH)) {
+	if ((G_bip32_path_len < 0x01) || (G_bip32_path_len > MAX_BIP32_PATH)) {
 		THROW(HYCON_SW_INCORRECT_DATA);
 	}
 
-	if (p1 == P1_FIRST) {
-		for (i = 0; i < G_bip32_path_length; i++) {
-			G_bip32_path[i] = (data_buffer[0] << 24) | (data_buffer[1] << 16) |
-				(data_buffer[2] << 8) | (data_buffer[3]);
-			data_buffer += 4;
-		}
+	if (p1 != P1_FIRST || p2 != P1_FIRST)
+		THROW(HYCON_SW_INCORRECT_P1_P2);
 
-		os_memset(&G_ram, 0, sizeof(G_ram));
-		G_ram.total_data_len = *(data_buffer++);
-		G_ram.remaining_data_len = G_ram.total_data_len - 18;
-		G_ram.is_correct_order = true;
-		os_memcpy(G_ram.encoded_tx, data_buffer,
-			min(G_ram.total_data_len, MAX_APDU_LEN-18));
-		G_ram.offset = min(G_ram.total_data_len, MAX_APDU_LEN-18);
-	} else if (p1 != P1_MORE) {
-		return THROW(HYCON_SW_INCORRECT_P1_P2);
+	uint8_t i;
+	for (i = 0; i < G_bip32_path_len; i++) {
+		G_bip32_path[i] =
+			((uint32_t)data_buffer[0] << 24) | ((uint32_t)data_buffer[1] << 16)
+			| ((uint32_t)data_buffer[2] << 8) | (data_buffer[3]);
+		data_buffer += 4;
+		data_len -= 4;
 	}
 
-	if (!G_ram.is_correct_order) {	// P1_FIRST should come first
-		return THROW(HYCON_SW_INCORRECT_P1_P2);
-	}
-
-	if (p1 == P1_MORE) {
-		os_memcpy(G_ram.encoded_tx + G_ram.offset, data_buffer,
-			min(G_ram.total_data_len, MAX_APDU_LEN-18));
-		G_ram.offset +=
-			min(MAX_APDU_LEN, G_ram.remaining_data_len);
-	}
-
-	G_ram.remaining_data_len -=
-		min(G_ram.remaining_data_len, MAX_APDU_LEN);
-
-	if (G_ram.remaining_data_len != 0) {
-		THROW(HYCON_SW_OK);
-	}
-
-	// all data has been received
-	// now it is safe to start decoding
 	hycon_tx tx_content = HYCON_TX_INIT_ZERO;
-	if (decode_tx(G_ram.encoded_tx, G_ram.total_data_len,
-		&tx_content))
+	if (decode_tx(data_buffer, data_len, &tx_content))
 	{
 		// UI variables setting
-		coin_amount_to_displayable_chars(tx_content.amount, G_ram.ui_amount);
-		coin_amount_to_displayable_chars(tx_content.fee, G_ram.ui_fee);
+		uint8_t ticker_offset = 0;
+		while (HYC_TICKER[ticker_offset]) {
+			G_ram.ui_amount[ticker_offset] = HYC_TICKER[ticker_offset];
+			ticker_offset++;
+		}
+		coin_amount_to_displayable_chars(tx_content.amount,
+			G_ram.ui_amount + ticker_offset);
+
+		ticker_offset = 0;
+		while (HYC_TICKER[ticker_offset]) {
+			G_ram.ui_fee[ticker_offset] = HYC_TICKER[ticker_offset];
+			ticker_offset++;
+		}
+		coin_amount_to_displayable_chars(tx_content.fee,
+			G_ram.ui_fee + ticker_offset);
+
 		bin_addr_to_hycon_address(tx_content.to, G_ram.ui_full_address);
 
 		// hash tx
-		blake2b(G_tx_hash, sizeof(G_tx_hash), G_ram.encoded_tx,
-			G_ram.total_data_len, &G_blake2b_state, 0);
+		blake2b(G_ram.tx_hash, sizeof(G_ram.tx_hash), data_buffer,
+			data_len, &G_blake2b_state, 0);
 
 		ux_step = 0;
 		ux_step_count = 4;
@@ -157,49 +146,43 @@ void handleSign(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
 	}
 }
 
-void handleGetPublicKey(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
-                        uint16_t data_length, volatile unsigned int *flags,
+void handle_get_public_key(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
+                        uint8_t data_len, volatile unsigned int *flags,
                         volatile unsigned int *tx) {
-	UNUSED(data_length);
+	UNUSED(data_len);
 
-	uint8_t privateKeyData[32];
-	uint32_t bip32Path[MAX_BIP32_PATH];
+	uint8_t private_component[32];
 	uint32_t i;
-	uint8_t bip32PathLength = *(data_buffer++);
-	cx_ecfp_private_key_t privateKey;
-	cx_ecfp_public_key_t publicKey;
-	uint8_t address[21];
+	uint8_t G_bip32_path_len = *(data_buffer++);
+	cx_ecfp_private_key_t private_key;
+	cx_ecfp_public_key_t public_key;
 
-	if ((bip32PathLength < 0x01) || (bip32PathLength > MAX_BIP32_PATH)) {
+	if ((G_bip32_path_len < 0x01) || (G_bip32_path_len > MAX_BIP32_PATH)) {
 		THROW(HYCON_SW_INCORRECT_DATA);
 	}
 	if ((p1 != P1_CONFIRM) && (p1 != P1_NON_CONFIRM)) {
 		THROW(HYCON_SW_INCORRECT_P1_P2);
 	}
 
-	os_memset(&G_ram, 0, sizeof(G_ram));
-
-	for (i = 0; i < bip32PathLength; i++) {
-		bip32Path[i] = (data_buffer[0] << 24) | (data_buffer[1] << 16) |
+	for (i = 0; i < G_bip32_path_len; i++) {
+		G_bip32_path[i] = (data_buffer[0] << 24) | (data_buffer[1] << 16) |
 			(data_buffer[2] << 8) | (data_buffer[3]);
 		data_buffer += 4;
 	}
 
-	os_perso_derive_node_bip32(CX_CURVE_256K1, bip32Path, bip32PathLength,
-		privateKeyData, NULL);
-	cx_ecfp_init_private_key(CX_CURVE_256K1, privateKeyData, 32, &privateKey);
-	cx_ecfp_generate_pair(CX_CURVE_256K1, &publicKey, &privateKey, 1);
-	os_memset(&privateKey, 0, sizeof(privateKey));
-	os_memset(privateKeyData, 0, sizeof(privateKeyData));
+	os_perso_derive_node_bip32(CX_CURVE_256K1, G_bip32_path, G_bip32_path_len,
+		private_component, NULL);
+	cx_ecfp_init_private_key(CX_CURVE_256K1, private_component, 32, &private_key);
+	cx_ecfp_generate_pair(CX_CURVE_256K1, &public_key, &private_key, 1);
+	os_memset(&private_key, 0, sizeof(private_key));
+	os_memset(private_component, 0, sizeof(private_component));
 
 	if (p1 == P1_NON_CONFIRM) {
-		*tx = set_result_publicKey(publicKey);
+		*tx = set_result_public_key(public_key);
 		THROW(HYCON_SW_OK);
 	} else {
 		// TODO: complete UI INS_GET_PUBLIC_KEY
 		// prepare for a UI based reply
-		snprintf(G_public_key_value, sizeof(G_public_key_value), "0x%.*s", 65,
-			publicKey.W);
 
 		ux_step = 0;
 		ux_step_count = 2;
@@ -209,8 +192,8 @@ void handleGetPublicKey(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
 	}
 }
 
-void handleGetAppConfig(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
-                        uint16_t data_length, volatile unsigned int *flags,
+void handle_get_app_config(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
+                        uint8_t data_length, volatile unsigned int *flags,
                         volatile unsigned int *tx) {
 	UNUSED(p1);
 	UNUSED(p2);

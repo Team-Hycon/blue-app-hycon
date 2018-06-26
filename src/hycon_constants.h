@@ -72,20 +72,19 @@
 #define P1_CONFIRM 0x01
 #define P1_NON_CONFIRM 0x00
 #define P1_FIRST 0x00
-#define P1_MORE 0x80
 
 #define CLA 0xE0
 
 #define MAX_BIP32_PATH 10
-#define MAX_APDU_LEN 255
 
 /* ------------------------------------------------------------------------- */
 /* ---                            OTHERS                                 --- */
 /* ------------------------------------------------------------------------- */
 
-static const uint8_t BASE58_ALPHABET[] = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+static const uint8_t const BASE58_ALPHABET[] =
+	"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+static const char const HYC_TICKER[] = "HYC ";
 #define HYC_TO_MINIMUM_AMOUNT 9
-#define MAX_ENCODED_TX_LEN 512
 #define COMPRESSED_PUB_KEY_LEN 33
 
 #endif  // HYCON_CONSTANTS_H

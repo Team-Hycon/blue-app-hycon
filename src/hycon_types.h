@@ -42,15 +42,11 @@ typedef struct hycon_tx_s {
 #define HYCON_TX_INIT_ZERO {NULL, NULL, 0, 0, 0, NULL, 0}
 
 typedef struct ram_s {
-	uint8_t encoded_tx[MAX_ENCODED_TX_LEN];
-	bool is_correct_order;
-	uint8_t total_data_len;
-	uint8_t remaining_data_len;
-	uint8_t offset;
+	hycon_hash_t tx_hash;
 
 	// UI
-	volatile char ui_amount[22];
-	volatile char ui_fee[22];
+	volatile char ui_amount[50];
+	volatile char ui_fee[50];
 	volatile char ui_full_address[50];
 } ram;
 
