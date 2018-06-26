@@ -34,6 +34,7 @@ Run `make test` and see the result.
 
 Example output (successful):
 ```Shell
+tests/check_utils.o
 Running suite(s): Utils
 100%: Checks: 2, Failures: 0, Errors: 0
 tests/check_protobuf.o
