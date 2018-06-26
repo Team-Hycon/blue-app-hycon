@@ -34,11 +34,14 @@ Run `make test` and see the result.
 
 Example output (successful):
 ```Shell
-Running suite(s): Protobuf
+Running suite(s): Utils
 100%: Checks: 2, Failures: 0, Errors: 0
+tests/check_protobuf.o
+Running suite(s): Protobuf
+100%: Checks: 6, Failures: 0, Errors: 0
 tests/check_hash.o
 Running suite(s): Hash
-100%: Checks: 1, Failures: 0, Errors: 0
+100%: Checks: 3, Failures: 0, Errors: 0
 ```
 Run `make test_clean` after running tests to clean created files.
 

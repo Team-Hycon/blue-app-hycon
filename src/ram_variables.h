@@ -23,7 +23,6 @@
 #include "os_io_seproxyhal.h"
 #endif
 
-#include "../blake2b/blake2.h"
 #include "hycon_types.h"
 
 /* ------------------------------------------------------------------------- */

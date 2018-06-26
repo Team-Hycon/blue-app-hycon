@@ -123,7 +123,9 @@ TEST_COMMON_SOURCES = blake2b/blake2b-ref.c src/hycon_helpers.c src/ram_variable
 test:
 	$(TEST_LD) -o $(TEST_SOURCE_PATH)/check_hash.o $(TEST_SOURCE_PATH)/check_hash.c $(TEST_COMMON_SOURCES) $(TEST_LDFLAGS) $(TEST_LDLIBS) -DUNIT_TEST
 	$(TEST_LD) -o $(TEST_SOURCE_PATH)/check_protobuf.o $(TEST_SOURCE_PATH)/check_protobuf.c $(TEST_COMMON_SOURCES) $(TEST_LDFLAGS) $(TEST_LDLIBS) -DUNIT_TEST
+	$(TEST_LD) -o $(TEST_SOURCE_PATH)/check_utils.o $(TEST_SOURCE_PATH)/check_utils.c $(TEST_COMMON_SOURCES) $(TEST_LDFLAGS) $(TEST_LDLIBS) -DUNIT_TEST
 
+	$(TEST_SOURCE_PATH)/check_utils.o
 	$(TEST_SOURCE_PATH)/check_protobuf.o
 	$(TEST_SOURCE_PATH)/check_hash.o
 
