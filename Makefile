@@ -15,6 +15,8 @@
 #  limitations under the License.
 #*******************************************************************************
 
+ifeq ($(TRAVIS),)
+
 ifeq ($(BOLOS_SDK),)
 $(error BOLOS_SDK is not set)
 endif
@@ -113,6 +115,7 @@ include $(BOLOS_SDK)/Makefile.rules
 # add dependency on custom makefile filename
 dep/%.d: %.c Makefile
 
+endif
 
 TEST_LDFLAGS = -O3 -Os -w
 TEST_LDLIBS = -lgcc -lc -lcheck -pthread -lcheck_pic -lrt -lm
