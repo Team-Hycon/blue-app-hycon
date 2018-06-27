@@ -1,5 +1,4 @@
-# Blue app Hycon
-
+# Blue app Hycon [![Build Status](https://travis-ci.org/arigatodl/blue-app-hycon.svg?branch=master)](https://travis-ci.org/arigatodl/blue-app-hycon)  
 Hycon wallet application framework for Ledger Nano S  
 This follows the specification available in the `/doc` directory.
 
