@@ -8,8 +8,11 @@ addons:
 cache:
     apt: true
     ccache: true
+    
+env:
+    global:
+      - TRAVIS=1
 
-# Run PHPs run-tests.php 
 script:
     - make test
 
