@@ -15,6 +15,8 @@
 #  limitations under the License.
 #*******************************************************************************
 
+#ifndef TRAVIS
+
 ifeq ($(BOLOS_SDK),)
 $(error BOLOS_SDK is not set)
 endif
@@ -119,6 +121,8 @@ TEST_LDLIBS = -lgcc -lc -lcheck -pthread -lcheck_pic -lrt -lm
 TEST_LD = gcc
 TEST_SOURCE_PATH = tests
 TEST_COMMON_SOURCES = blake2b/blake2b-ref.c src/hycon_helpers.c src/ram_variables.c
+
+#endif
 
 test:
 	$(TEST_LD) -o $(TEST_SOURCE_PATH)/check_hash.o $(TEST_SOURCE_PATH)/check_hash.c $(TEST_COMMON_SOURCES) $(TEST_LDFLAGS) $(TEST_LDLIBS) -DUNIT_TEST
