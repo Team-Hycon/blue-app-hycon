@@ -23,33 +23,26 @@ from ledgerblue.comm import getDongle
 from ledgerblue.commException import CommException
 import binascii
 from hyconHelpers import *
-import tx_pb2
 
 bip32_path = "44'/1397'/0'/0/0"
 
-tx = tx_pb2.Tx()
-tx.to = bytes(bytearray.fromhex("db6612b309d257a2aebd59b7445a900ed775d921"))
-tx.amount = 123456
-tx.fee = 100
-tx.nonce = 1234
-
+keypath = parse_bip32_path(bip32_path)
 apdu = []
 writeUint8BE(0xE0, apdu)	# CLA
-writeUint8BE(0x04, apdu)	# INS (INS_SIGN)
-writeUint8BE(0x00, apdu)	# P1
+writeUint8BE(0x02, apdu)	# INS (INS_GET_PUBLIC_KEY)
+writeUint8BE(0x01, apdu)	# P1
 writeUint8BE(0x00, apdu)	# P2
-
-keypath = parse_bip32_path(bip32_path)
-encodedTx = tx.SerializeToString()
-
-writeUint8BE(len(keypath) + len(encodedTx), apdu)	# bip32 length
+writeUint8BE(len(keypath), apdu)	# bip32 length
 apdu.extend(keypath)	# keypath
-apdu.extend(encodedTx)	# encodedTx
 
 dongle = getDongle(True)
 result = dongle.exchange(bytes(apdu))
 
-signature = bytes(result[1: 1 + len(result)])
-recovery = result[0]
-print ("Signature =", binascii.hexlify(signature).decode('ascii'))
-print ("Recovery =", recovery)
+offset = 1 + result[0]
+hex_address = result[offset + 1 : offset + 1 + result[offset]]
+offset = offset + 1 + result[offset]
+hycon_address = result[offset + 1 : offset + 1 + result[offset]]
+
+print ("Public key = " + binascii.hexlify(bytearray(result[1 : 1 + result[0]])).decode('ascii'))
+print ("Hex Address = 0x" + binascii.hexlify(hex_address).decode('ascii'))
+print ("Hycon Address = " + (hycon_address).decode('ascii'))

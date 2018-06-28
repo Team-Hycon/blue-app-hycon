@@ -32,11 +32,12 @@ writeUint8BE(0x04, apdu)	# INS (INS_SIGN)
 writeUint8BE(0x00, apdu)	# P1
 writeUint8BE(0x00, apdu)	# P2
 
+rawTx = bytes(bytearray.fromhex("0a146220efa7b2bd8550c33da0796c779170d3fb9dc21214e161124d4aa41ca0df6bafecb0408971cff6c096180a20012800"))
+
 keypath = parse_bip32_path(bip32_path)
-writeUint8BE(len(keypath), apdu)	# bip32 length
+writeUint8BE(len(keypath) + len(rawTx), apdu)	# bip32 length
 apdu.extend(keypath)	# keypath
-writeUint8BE(len(bytes(bytearray.fromhex("0a146220efa7b2bd8550c33da0796c779170d3fb9dc21214e161124d4aa41ca0df6bafecb0408971cff6c096180a20012800"))), apdu)	# encodedTx length
-apdu.extend(bytes(bytearray.fromhex("0a146220efa7b2bd8550c33da0796c779170d3fb9dc21214e161124d4aa41ca0df6bafecb0408971cff6c096180a20012800")))	# encodedTx
+apdu.extend(rawTx)	# encodedTx
 
 """
 EncodedTx = {
@@ -50,5 +51,7 @@ EncodedTx = {
 dongle = getDongle(True)
 result = dongle.exchange(bytes(apdu))
 
-signature = bytes(result[1: 1 + 64])
-print ("Signature = ", binascii.hexlify(signature).decode('ascii'))
+signature = bytes(result[1: 1 + len(result)])
+recovery = result[0]
+print ("Signature =", binascii.hexlify(signature).decode('ascii'))
+print ("Recovery =", recovery)

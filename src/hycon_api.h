@@ -53,7 +53,7 @@ void get_compressed_public_key_value(const unsigned char *in, unsigned char *out
 #ifndef UNIT_TEST
 void get_address_string_from_key(const cx_ecfp_public_key_t publicKey,
                                  uint8_t *out);
-uint32_t set_result_public_Key(cx_ecfp_public_key_t publicKey);
+uint32_t set_result_public_key();
 #endif	// UNIT_TEST
 
 /* ------------------------------------------------------------------------- */

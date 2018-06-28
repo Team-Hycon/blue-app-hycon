@@ -256,7 +256,7 @@ const bagl_element_t ui_address_nanos[] = {
 
 	{{BAGL_LABELINE, 0x01, 0, 26, 128, 12, 0, 0, 0, 0xFFFFFF, 0x000000,
 		BAGL_FONT_OPEN_SANS_EXTRABOLD_11px | BAGL_FONT_ALIGNMENT_CENTER, 0},
-	"publicKey",
+	"address",
 	0,
 	0,
 	0,
@@ -266,7 +266,7 @@ const bagl_element_t ui_address_nanos[] = {
 
 	{{BAGL_LABELINE, 0x02, 0, 12, 128, 12, 0, 0, 0, 0xFFFFFF, 0x000000,
 		BAGL_FONT_OPEN_SANS_REGULAR_11px | BAGL_FONT_ALIGNMENT_CENTER, 0},
-	"PublicKey",
+	"Address",
 	0,
 	0,
 	0,
@@ -276,7 +276,7 @@ const bagl_element_t ui_address_nanos[] = {
 
 	{{BAGL_LABELINE, 0x02, 23, 26, 82, 12, 0x80 | 10, 0, 0, 0xFFFFFF, 0x000000,
 		BAGL_FONT_OPEN_SANS_EXTRABOLD_11px | BAGL_FONT_ALIGNMENT_CENTER, 26},
-	(char *)G_public_key_value,
+	G_ram.ui_full_address,
 	0,
 	0,
 	0,
@@ -324,13 +324,12 @@ unsigned int ui_address_nanos_button(unsigned int button_mask,
 /* ---                           UI LOGICS                               --- */
 /* ------------------------------------------------------------------------- */
 
-//TODO: display public key on display
 unsigned int io_seproxyhal_touch_address_ok(const bagl_element_t *e) {
-	//uint32_t tx = set_result_get_publicKey();
-	G_io_apdu_buffer[0] = 0x90;
-	G_io_apdu_buffer[1] = 0x00;
+	uint32_t tx = set_result_public_key();
+	G_io_apdu_buffer[tx++] = 0x90;
+	G_io_apdu_buffer[tx++] = 0x00;
 	// Send back the response, do not restart the event loop
-	io_exchange(CHANNEL_APDU | IO_RETURN_AFTER_TX, 2);
+	io_exchange(CHANNEL_APDU | IO_RETURN_AFTER_TX, tx);
 	// Display back the original UX
 	ui_idle();
 

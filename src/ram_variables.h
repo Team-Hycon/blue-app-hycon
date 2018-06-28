@@ -36,8 +36,6 @@ extern ux_state_t ux;	// don't change (used for UX_ functions)
 extern unsigned int ux_step;
 extern unsigned int ux_step_count;
 
-extern unsigned char G_public_key_value[65];
-
 extern enum UI_STATE G_ui_state;
 
 /* ------------------------------------------------------------------------- */
@@ -47,6 +45,7 @@ extern enum UI_STATE G_ui_state;
 #ifndef UNIT_TEST
 // IO buffer to communicate with the outside world.
 extern unsigned char G_io_seproxyhal_spi_buffer[IO_SEPROXYHAL_BUFFER_SIZE_B];
+extern cx_ecfp_public_key_t G_public_key;
 #endif
 
 extern uint8_t G_bip32_path_len;

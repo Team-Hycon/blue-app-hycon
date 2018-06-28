@@ -30,8 +30,6 @@ unsigned int ux_step;
 unsigned int ux_step_count;
 enum UI_STATE G_ui_state;
 
-unsigned char G_public_key_value[65];
-
 /* ------------------------------------------------------------------------- */
 /* ---                     CRYPTOGRAPHY VARIABLES                        --- */
 /* ------------------------------------------------------------------------- */
@@ -39,6 +37,7 @@ unsigned char G_public_key_value[65];
 #ifndef UNIT_TEST
 /** IO buffer to communicate with the outside world. */
 unsigned char G_io_seproxyhal_spi_buffer[IO_SEPROXYHAL_BUFFER_SIZE_B];
+cx_ecfp_public_key_t G_public_key;
 #endif
 
 blake2b_state G_blake2b_state;

@@ -155,7 +155,6 @@ void handle_get_public_key(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
 	uint32_t i;
 	uint8_t G_bip32_path_len = *(data_buffer++);
 	cx_ecfp_private_key_t private_key;
-	cx_ecfp_public_key_t public_key;
 
 	if ((G_bip32_path_len < 0x01) || (G_bip32_path_len > MAX_BIP32_PATH)) {
 		THROW(HYCON_SW_INCORRECT_DATA);
@@ -173,16 +172,17 @@ void handle_get_public_key(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
 	os_perso_derive_node_bip32(CX_CURVE_256K1, G_bip32_path, G_bip32_path_len,
 		private_component, NULL);
 	cx_ecfp_init_private_key(CX_CURVE_256K1, private_component, 32, &private_key);
-	cx_ecfp_generate_pair(CX_CURVE_256K1, &public_key, &private_key, 1);
+	cx_ecfp_generate_pair(CX_CURVE_256K1, &G_public_key, &private_key, 1);
 	os_memset(&private_key, 0, sizeof(private_key));
 	os_memset(private_component, 0, sizeof(private_component));
 
 	if (p1 == P1_NON_CONFIRM) {
-		*tx = set_result_public_key(public_key);
+		*tx = set_result_public_key();
 		THROW(HYCON_SW_OK);
 	} else {
-		// TODO: complete UI INS_GET_PUBLIC_KEY
-		// prepare for a UI based reply
+		uint8_t hex_address[21];
+		get_address_string_from_key(G_public_key, hex_address);
+		bin_addr_to_hycon_address(hex_address, G_ram.ui_full_address);
 
 		ux_step = 0;
 		ux_step_count = 2;
