@@ -87,4 +87,6 @@ static const char const HYC_TICKER[] = "HYC ";
 #define HYC_TO_MINIMUM_AMOUNT 9
 #define COMPRESSED_PUB_KEY_LEN 33
 
+#define MAX_CHAR_PER_LINE 25
+
 #endif  // HYCON_CONSTANTS_H
