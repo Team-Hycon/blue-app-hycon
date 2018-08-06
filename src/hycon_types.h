@@ -28,7 +28,10 @@
 
 #include <stdbool.h>
 #include "hycon_constants.h"
-//#include "../blake2b/blake2.h"
+
+#ifdef UNIT_TEST
+#include "../blake2b/blake2.h"
+#endif
 
 typedef uint8_t hycon_hash_t[32];
 enum UI_STATE { UI_IDLE, UI_VERIFY };
