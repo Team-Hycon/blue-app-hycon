@@ -1406,6 +1406,7 @@ const bagl_element_t ui_details_blue[] = {
 /* ---                           MENU BUTTONS                            --- */
 /* ------------------------------------------------------------------------- */
 
+#if defined(TARGET_NANOS)
 unsigned int ui_approval_nanos_button(unsigned int button_mask,
                                       unsigned int button_mask_counter) {
 	switch (button_mask) {
@@ -1435,7 +1436,9 @@ unsigned int ui_address_nanos_button(unsigned int button_mask,
 
 	return 0;
 }
+#endif // TARGET_NANOS
 
+#if defined(TARGET_BLUE)
 unsigned int ui_address_blue_button(unsigned int button_mask,
                                     unsigned int button_mask_counter) {
 	return 0;
@@ -1455,6 +1458,7 @@ unsigned int ui_idle_blue_button(unsigned int button_mask,
                                  unsigned int button_mask_counter) {
  	return 0;
 }
+#endif // TARGET_BLUE
 
 /* ------------------------------------------------------------------------- */
 /* ---                           UI LOGICS                               --- */

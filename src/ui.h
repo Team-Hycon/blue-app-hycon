@@ -22,20 +22,26 @@
 #include "os_io_seproxyhal.h"
 #include "hycon_types.h"
 
+#if defined(TARGET_BLUE)
 #define COLOR_BG_1 0xF9F9F9
 #define COLOR_APP 0x0ebdcf
 #define COLOR_APP_LIGHT 0x87dee6
 #define BAGL_FONT_OPEN_SANS_LIGHT_16_22PX_AVG_WIDTH 10
 #define BAGL_FONT_OPEN_SANS_REGULAR_10_13PX_AVG_WIDTH 8
+#endif // TARGET_BLUE
 
 /* ------------------------------------------------------------------------- */
 /* ---                           MENU BUTTONS                            --- */
 /* ------------------------------------------------------------------------- */
 
+#if defined(TARGET_NANOS)
 unsigned int ui_approval_nanos_button(unsigned int button_mask,
 	unsigned int button_mask_counter);
 unsigned int ui_address_nanos_button(unsigned int button_mask,
 	unsigned int button_mask_counter);
+#endif // TARGET_NANOS
+
+#if defined(TARGET_BLUE)
 unsigned int ui_address_blue_button(unsigned int button_mask,
 	unsigned int button_mask_counter);
 unsigned int ui_approval_blue_button(unsigned int button_mask,
@@ -44,6 +50,7 @@ unsigned int ui_details_blue_button(unsigned int button_mask,
 	unsigned int button_mask_counter);
 unsigned int ui_idle_blue_button(unsigned int button_mask,
 	unsigned int button_mask_counter);
+#endif // TARGET_BLUE
 
 /* ------------------------------------------------------------------------- */
 /* ---                           MENUS                                   --- */
@@ -88,10 +95,6 @@ const bagl_element_t *ui_menu_item_out_over(const bagl_element_t *element);
 /* ------------------------------------------------------------------------- */
 /* ---                           UI LOGICS                               --- */
 /* ------------------------------------------------------------------------- */
-
-#if defined(TARGET_BLUE)
-unsigned int io_seproxyhal_touch_settings(const bagl_element_t *element);
-#endif // TARGET_BLUE
 
 unsigned int io_seproxyhal_touch_exit(const bagl_element_t *element);
 unsigned int io_seproxyhal_touch_tx_ok(const bagl_element_t *element);
