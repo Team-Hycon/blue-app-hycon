@@ -28,10 +28,14 @@
 
 #include <stdbool.h>
 #include "hycon_constants.h"
+
+#ifndef TARGET_BLUE
 #include "../blake2b/blake2.h"
+#endif
 
 typedef uint8_t hycon_hash_t[32];
 enum UI_STATE { UI_IDLE, UI_VERIFY };
+enum UI_BLUE_APPROVAL_STATE { APPROVAL_TRANSACTION, APPROVAL_MESSAGE };
 
 typedef struct hycon_tx_s {
 	uint8_t to[21];
@@ -40,8 +44,6 @@ typedef struct hycon_tx_s {
 	uint32_t nonce;
 } hycon_tx;
 
-#define HYCON_TX_INIT_ZERO {NULL, NULL, 0, 0, 0, NULL, 0}
-
 typedef struct ram_s {
 	hycon_hash_t tx_hash;
 
@@ -49,6 +51,8 @@ typedef struct ram_s {
 	volatile char ui_amount[50];
 	volatile char ui_fee[50];
 	volatile char ui_full_address[50];
+	volatile char ui_address_summary[32];
 } ram;
 
+typedef void (*callback_t)(void);
 #endif // HYCON_TYPES_H

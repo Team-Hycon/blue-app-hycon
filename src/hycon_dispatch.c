@@ -89,8 +89,8 @@ void handleApdu(volatile unsigned int *flags, volatile unsigned int *tx) {
 }
 
 void handle_sign(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
-                uint8_t data_len, volatile unsigned int *flags,
-                volatile unsigned int *tx) {
+                 uint8_t data_len, volatile unsigned int *flags,
+                 volatile unsigned int *tx) {
 	UNUSED(tx);
 	G_bip32_path_len = (*data_buffer++);
 	data_len--;
@@ -111,7 +111,7 @@ void handle_sign(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
 		data_len -= 4;
 	}
 
-	hycon_tx tx_content = HYCON_TX_INIT_ZERO;
+	hycon_tx tx_content = {0};
 	if (decode_tx(data_buffer, data_len, &tx_content))
 	{
 		// UI variables setting
@@ -137,9 +137,14 @@ void handle_sign(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
 		blake2b(G_ram.tx_hash, sizeof(G_ram.tx_hash), data_buffer,
 			data_len, &G_blake2b_state, 0);
 
+#if defined(TARGET_BLUE)
+		ui_approval_transaction_blue_init();
+#elif defined(TARGET_NANOS)
 		ux_step = 0;
 		ux_step_count = 4;
 		UX_DISPLAY(ui_approval_nanos, ui_approval_prepro);
+#endif // #if TARGET_ID
+
 		*flags |= IO_ASYNCH_REPLY;
 	} else {
 		THROW(HYCON_SW_INCORRECT_DATA);
@@ -147,8 +152,8 @@ void handle_sign(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
 }
 
 void handle_get_public_key(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
-                        uint8_t data_len, volatile unsigned int *flags,
-                        volatile unsigned int *tx) {
+                           uint8_t data_len, volatile unsigned int *flags,
+                           volatile unsigned int *tx) {
 	UNUSED(data_len);
 
 	uint8_t private_component[32];
@@ -184,17 +189,21 @@ void handle_get_public_key(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
 		get_address_string_from_key(G_public_key, hex_address);
 		bin_addr_to_hycon_address(hex_address, G_ram.ui_full_address);
 
+#if defined(TARGET_BLUE)
+		UX_DISPLAY(ui_address_blue, ui_address_blue_prepro);
+#elif defined(TARGET_NANOS)
 		ux_step = 0;
 		ux_step_count = 2;
 		UX_DISPLAY(ui_address_nanos, ui_address_prepro);
+#endif // #if TARGET_ID
 
 		*flags |= IO_ASYNCH_REPLY;
 	}
 }
 
 void handle_get_app_config(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
-                        uint8_t data_length, volatile unsigned int *flags,
-                        volatile unsigned int *tx) {
+                           uint8_t data_length, volatile unsigned int *flags,
+                           volatile unsigned int *tx) {
 	UNUSED(p1);
 	UNUSED(p2);
 	UNUSED(data_buffer);

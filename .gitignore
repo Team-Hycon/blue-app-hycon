@@ -3,3 +3,4 @@ dep
 debug
 obj
 bin
+src/glyphs.*

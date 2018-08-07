@@ -26,14 +26,18 @@ APPNAME = "Hycon"
 COINID = 1397
 
 APPVERSION_M = 0
-APPVERSION_N = 1
+APPVERSION_N = 2
 APPVERSION_P = 0
 
 APPVERSION=$(APPVERSION_M).$(APPVERSION_N).$(APPVERSION_P)
 APP_LOAD_PARAMS = --path "44'/$(COINID)'" --appFlags 0x40 --curve secp256k1 --apdu $(COMMON_LOAD_PARAMS)
 APP_DELETE_PARAMS =  --apdu $(COMMON_DELETE_PARAMS)
 
+ifeq ($(TARGET_NAME),TARGET_BLUE)
+ICONNAME=icon_blue.gif
+else
 ICONNAME=icon_nano.gif
+endif
 
 ################
 # Default rule #
@@ -96,12 +100,14 @@ include $(BOLOS_SDK)/Makefile.glyphs
 APP_SOURCE_PATH += src blake2b
 SDK_SOURCE_PATH += lib_stusb qrcode
 
-#use the SDK U2F+HIDGEN USB profile
-SDK_SOURCE_PATH += lib_u2f lib_stusb_impl
-
+# U2F
 DEFINES += USB_SEGMENT_SIZE=64
-DEFINES += U2F_PROXY_MAGIC=\"MOON\"
+DEFINES += BLE_SEGMENT_SIZE=32 #max MTU
+DEFINES += U2F_PROXY_MAGIC=\"HYCON\"
 DEFINES += HAVE_IO_U2F HAVE_U2F
+
+#use the SDK U2F+HIDGEN USB profile
+SDK_SOURCE_PATH += lib_u2f lib_stusb_impl lib_stusb qrcode
 
 load: all
 	python -m ledgerblue.loadApp $(APP_LOAD_PARAMS)
