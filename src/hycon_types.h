@@ -29,7 +29,7 @@
 #include <stdbool.h>
 #include "hycon_constants.h"
 
-#ifndef TARGET_BLUE
+#ifdef UNIT_TEST
 #include "../blake2b/blake2.h"
 #endif
 
