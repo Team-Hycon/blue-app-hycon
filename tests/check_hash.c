@@ -4,7 +4,7 @@
 #include "../src/hycon_api.h"
 #include "test_data.h"
 #include "stdio.h"
-blake2b_state G_blake2b_state;
+_blake2b_state G_blake2b_state;
 
 void setup(void)
 {

@@ -1,7 +1,8 @@
 /******************************************************************************
 *   HYCON Wallet for Ledger Nano S
 *   (c) 2018 Dulguun Batmunkh
-*   (c) 2018 Hycon
+*   (c) 2019 Joonbum Lee <jbamlee65@gmail.com>
+*   (c) 2018~2019 Hycon
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -133,9 +134,13 @@ void handle_sign(uint8_t p1, uint8_t p2, uint8_t *data_buffer,
 
 		bin_addr_to_hycon_address(tx_content.to, G_ram.ui_full_address);
 
-		// hash tx
-		blake2b(G_ram.tx_hash, sizeof(G_ram.tx_hash), data_buffer,
-			data_len, &G_blake2b_state, 0);
+	// hash tx
+#ifndef UNIT_TEST
+	cx_blake2b_init(&G_blake2b_hash.header, 256);
+	cx_hash(&G_blake2b_hash.header, CX_LAST, data_buffer, data_len, G_ram.tx_hash, sizeof(G_ram.tx_hash));
+#else
+	blake2b(G_ram.tx_hash, sizeof(G_ram.tx_hash), data_buffer, data_len, &G_blake2b_state, 0);
+#endif
 
 #if defined(TARGET_BLUE)
 		ui_approval_transaction_blue_init();

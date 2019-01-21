@@ -20,25 +20,25 @@
 
 #define BLAKE2_PACKED(x) x __attribute__((packed))
 
-enum blake2b_constant
+enum _blake2b_constant
 {
-	BLAKE2B_BLOCKBYTES = 128,
-	BLAKE2B_OUTBYTES   = 64,
-	BLAKE2B_KEYBYTES   = 64,
-	BLAKE2B_SALTBYTES  = 16,
-	BLAKE2B_PERSONALBYTES = 16
+	_BLAKE2B_BLOCKBYTES = 128,
+	_BLAKE2B_OUTBYTES   = 64,
+	_BLAKE2B_KEYBYTES   = 64,
+	_BLAKE2B_SALTBYTES  = 16,
+	_BLAKE2B_PERSONALBYTES = 16
 };
 
-typedef struct blake2b_state__
+typedef struct _blake2b_state__
 {
 	uint64_t h[8];
 	uint64_t t[2];
 	uint64_t f[2];
-	uint8_t  buf[BLAKE2B_BLOCKBYTES];
+	uint8_t  buf[_BLAKE2B_BLOCKBYTES];
 	size_t   buflen;
 	size_t   outlen;
 	uint8_t  last_node;
-} blake2b_state;
+} _blake2b_state;
 
 BLAKE2_PACKED(struct blake2b_param__
 {
@@ -52,19 +52,19 @@ BLAKE2_PACKED(struct blake2b_param__
 	uint8_t  node_depth;    /* 17 */
 	uint8_t  inner_length;  /* 18 */
 	uint8_t  reserved[14];  /* 32 */
-	uint8_t  salt[BLAKE2B_SALTBYTES]; /* 48 */
-	uint8_t  personal[BLAKE2B_PERSONALBYTES];  /* 64 */
+	uint8_t  salt[_BLAKE2B_SALTBYTES]; /* 48 */
+	uint8_t  personal[_BLAKE2B_PERSONALBYTES];  /* 64 */
 });
 
 typedef struct blake2b_param__ blake2b_param;
 
 /* Streaming API */
-int blake2b_init( blake2b_state *S, size_t outlen );
-int blake2b_init_key( blake2b_state *S, size_t outlen, const void *key,
+int blake2b_init( _blake2b_state *S, size_t outlen );
+int blake2b_init_key( _blake2b_state *S, size_t outlen, const void *key,
                       size_t keylen );
-int blake2b_init_param( blake2b_state *S, const blake2b_param *P );
-int blake2b_update( blake2b_state *S, const void *in, size_t inlen );
-int blake2b_final( blake2b_state *S, void *out, size_t outlen );
+int blake2b_init_param( _blake2b_state *S, const blake2b_param *P );
+int blake2b_update( _blake2b_state *S, const void *in, size_t inlen );
+int blake2b_final( _blake2b_state *S, void *out, size_t outlen );
 
 /* Simple API */
 int blake2b( void *out, size_t outlen, const void *in, size_t inlen,

@@ -124,7 +124,7 @@ dep/%.d: %.c Makefile
 endif
 
 TEST_LDFLAGS = -O3 -Os -w
-TEST_LDLIBS = -lgcc -lc -lcheck -pthread -lcheck_pic -lrt -lm
+TEST_LDLIBS = -lgcc -lc -lcheck -pthread -lcheck_pic -lrt -lm -lsubunit
 TEST_LD = gcc
 TEST_SOURCE_PATH = tests
 TEST_COMMON_SOURCES = blake2b/blake2b-ref.c src/hycon_helpers.c src/ram_variables.c

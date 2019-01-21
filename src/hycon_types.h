@@ -1,7 +1,8 @@
 /******************************************************************************
 *   HYCON Wallet for Ledger Nano S
 *   (c) 2018 Dulguun Batmunkh
-*   (c) 2018 Hycon
+*   (c) 2019 Joonbum Lee <jbamlee65@gmail.com>
+*   (c) 2018~2019 Hycon
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -24,6 +25,7 @@
 #include <stdlib.h>
 #else
 #include "os.h"
+#include "cx.h"
 #endif
 
 #include <stdbool.h>

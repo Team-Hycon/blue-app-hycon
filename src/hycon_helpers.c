@@ -1,7 +1,8 @@
 /******************************************************************************
 *   HYCON Wallet for Ledger Nano S
 *   (c) 2018 Dulguun Batmunkh
-*   (c) 2018 Hycon
+*   (c) 2019 Joonbum Lee <jbamlee65@gmail.com>
+*   (c) 2018~2019 Hycon
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -32,8 +33,9 @@ void get_address_string_from_key(const cx_ecfp_public_key_t public_key,
 	// Compressed public key
 	unsigned char tmp_pub_key[COMPRESSED_PUB_KEY_LEN];
 	get_compressed_public_key_value(public_key.W, tmp_pub_key);
-
-	blake2b(hash_address, sizeof(hycon_hash_t), tmp_pub_key, COMPRESSED_PUB_KEY_LEN, &G_blake2b_state, 0);
+	
+	cx_blake2b_init(&G_blake2b_hash.header, 256);
+	cx_hash(&G_blake2b_hash.header, CX_LAST, tmp_pub_key, COMPRESSED_PUB_KEY_LEN, &hash_address, sizeof(hycon_hash_t));
 
 	os_memmove(out, hash_address + 12, 20);
 }
@@ -232,7 +234,12 @@ size_t check_sum(char *out, const void *data, size_t data_len) {
 	const size_t len = 4;
 	hycon_hash_t hash;
 
+#ifndef UNIT_TEST
+	cx_blake2b_init(&G_blake2b_hash.header, 256);
+	cx_hash(&G_blake2b_hash.header, CX_LAST, data, data_len, &hash, sizeof(hycon_hash_t));
+#else
 	blake2b(hash, sizeof(hycon_hash_t), data, 20, &G_blake2b_state, 0);
+#endif
 	unsigned char tmp[164];
 	base58_encode(tmp, hash, sizeof(hycon_hash_t));
 	os_memcpy(out, tmp, len);
