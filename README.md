@@ -55,7 +55,7 @@ If you'd like to help us out, the [Pull Request](https://github.com/Team-Hycon/b
 ## Authors
 
 * **Dulguun Batmunkh** - *Initial work* <dulguun@glosfer.com>
-
+* **Joonbum Lee**  - *since 2019* <jblee@glosfer.com>
 ## License
 
 This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details
